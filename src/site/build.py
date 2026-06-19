@@ -520,12 +520,14 @@ def build_site(analysis_dir: str = "data/analysis", out: str = "docs") -> None:
         " not the full catalogue.",
         "SteamDB was excluded from this pipeline (Cloudflare / ToS barriers)."
         " The Steam News API IS used for update cadence detection (~2,169 games).",
-        "Theme and mechanic classifications are derived from short description"
-        " keyword matching (word-boundary regex), NOT from Steam tags — per-game"
-        " tags were unavailable from the SteamSpy endpoint. Medium-low confidence;"
-        " treat as directional signals only.",
-        "Art style has no data source in this pipeline (depended on per-game Steam tags,"
-        " which were unavailable). Art style is null for all games.",
+        "Theme, mechanic, and art style classifications are derived from each game's real"
+        " Steam user tags (fetched via the SteamSpy appdetails endpoint) plus short"
+        " description keyword matching (word-boundary regex). Tags are crowd-sourced"
+        " (community-applied, can be noisy or popularity-biased) — medium confidence;"
+        " treat as directional signals, not authoritative genre data.",
+        "Art style is classified from Steam user tags (e.g. 'Pixel Graphics', 'Anime')."
+        " 3,206 of 3,479 games have an art style assigned. Tags are crowd-sourced"
+        " (medium confidence — see above).",
         "Weighted score = review_pct_positive × log(1 + total_owners);"
         " biases toward popular games with high approval.",
     ]

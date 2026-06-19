@@ -119,7 +119,9 @@
       quantitative spine{% if n_themes %}, finding <strong>{{ n_themes }} distinct themes</strong>{% endif %}.
       {% if top_theme and top_theme != '—' %}
       The most represented theme in the corpus is <strong>{{ top_theme }}</strong>
-      (classified by description keyword matching — medium-low confidence; see Methodology).
+      (classified from Steam user tags + description keyword matching — medium confidence;
+      the prevalence of "rpg" reflects the common community "RPG" tag on Steam idle games).
+      See <a href="methodology.html">Methodology</a>.
       {% endif %}
       {% if top_perf_theme and top_perf_theme != '—' %}
       By weighted performance score (review % × log owners), <strong>{{ top_perf_theme }}</strong>
@@ -160,12 +162,13 @@
       not verified sales. Weighted score = review% × log(1 + owners).
     </p>
     <div class="honesty">
-      <strong>Theme caveat (medium-low confidence):</strong> Themes are classified
-      by keyword word-boundary matching against each game's <em>short description</em>
-      only — per-game Steam tags were not available from the data source used.
-      This is a heuristic: a game may be mis-classified if its description contains
-      thematic words incidentally. Treat theme counts as directional signals, not
-      authoritative genre data. See <a href="methodology.html">Methodology</a> for details.
+      <strong>Theme caveat (medium confidence):</strong> Themes are classified from each
+      game's real <em>Steam user tags</em> (fetched via SteamSpy appdetails) plus its
+      <em>short description</em>, using word-boundary keyword matching. Steam tags are
+      crowd-sourced — community-applied and can be noisy or popularity-biased — so this
+      is a medium-confidence heuristic: better than description-only, but not authoritative
+      genre data. Treat theme counts as directional signals.
+      See <a href="methodology.html">Methodology</a> for details.
     </div>
     {% if figures.theme_bar %}
     <div class="chart-wrap">{{ figures.theme_bar | safe }}</div>
@@ -254,16 +257,17 @@
   <section id="art">
     <h2>Art Style Distribution</h2>
     <p class="caption">
-      Art style classification depended on per-game Steam tags, which were not
-      available from the data source used in this pipeline. Art style is null
-      for all 3,479 games — no art style chart can be rendered. This is a known
-      pipeline limitation, not a rendering error. See
-      <a href="methodology.html">Methodology</a> for details.
+      Art style is classified from each game's real Steam user tags (e.g. "Pixel Graphics",
+      "Anime", "Hand-drawn") fetched via the SteamSpy appdetails endpoint.
+      3,206 of 3,479 games have an art style assigned. Tags are crowd-sourced —
+      community-applied and can be noisy or popularity-biased (medium confidence).
+      Owner counts are SteamSpy modeled estimates. See
+      <a href="methodology.html">Methodology</a> for full caveats.
     </p>
     {% if figures.art_bar %}
     <div class="chart-wrap">{{ figures.art_bar | safe }}</div>
     {% else %}
-    <p><em>Art style data unavailable — per-game Steam tags were not accessible via the SteamSpy endpoint used. Art style is null for all games in this dataset.</em></p>
+    <p><em>Art style data not available in this build.</em></p>
     {% endif %}
   </section>
 
