@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Methodology &amp; Caveats — Idle Game Market Analysis</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+           margin: 0; background: #f8f9fa; color: #212529; }
+    header { background: #1a1a2e; color: #eee; padding: 2rem 2rem 1.5rem; }
+    header h1 { margin: 0 0 0.4rem; font-size: 1.8rem; }
+    header p  { margin: 0; opacity: 0.75; font-size: 0.95rem; }
+    nav { background: #16213e; padding: 0.5rem 2rem; }
+    nav a { color: #aac4ff; text-decoration: none; margin-right: 1.5rem; font-size: 0.9rem; }
+    main { max-width: 960px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+    section { background: #fff; border-radius: 8px; padding: 1.5rem 2rem;
+              margin-bottom: 2rem; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+    h2 { font-size: 1.3rem; margin-top: 0; border-bottom: 2px solid #e9ecef; padding-bottom: 0.5rem; }
+    h3 { font-size: 1.05rem; color: #495057; }
+    table { border-collapse: collapse; width: 100%; font-size: 0.9rem; margin: 1rem 0; }
+    th, td { border: 1px solid #dee2e6; padding: 0.5rem 0.75rem; text-align: left; }
+    th { background: #f1f3f5; }
+    .caveat-list { list-style: none; padding: 0; }
+    .caveat-list li { border-left: 4px solid #ffc107; padding: 0.5rem 0.75rem;
+                      margin-bottom: 0.5rem; background: #fffbea; border-radius: 0 4px 4px 0;
+                      font-size: 0.9rem; }
+    footer { text-align: center; font-size: 0.78rem; color: #adb5bd; padding: 2rem 0 1rem; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Methodology &amp; Caveats</h1>
+  <p>Idle/Incremental Game Market Analysis — data pipeline design, known limitations, and confidence ratings.</p>
+</header>
+<nav>
+  <a href="index.html">← Report</a>
+</nav>
+<main>
+
+  <!-- =========================================================
+       DATA SOURCES
+  ========================================================= -->
+  <section id="sources">
+    <h2>Data Sources</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Source</th>
+          <th>Role</th>
+          <th>Confidence</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Steam store pages</td>
+          <td>Primary spine — game metadata, tags, review scores</td>
+          <td>High (review % from thousands of reviews)</td>
+          <td>Tags are user-applied; not all games tagged consistently.</td>
+        </tr>
+        <tr>
+          <td>SteamSpy</td>
+          <td>Owner count estimates</td>
+          <td>Medium — modeled estimates, ±30–50% typical</td>
+          <td>Not verified sales data. Post-2019 API changes reduced accuracy.
+              Treat as order-of-magnitude only.</td>
+        </tr>
+        <tr>
+          <td>itch.io</td>
+          <td>Supplementary coverage count</td>
+          <td>Low — one browse page, no owner/revenue data</td>
+          <td>Free/paid split only. Not included in quantitative charts.</td>
+        </tr>
+        <tr>
+          <td>Kongregate</td>
+          <td>Supplementary coverage count</td>
+          <td>Low — 1–5 star ratings mapped to %; NOT comparable to Steam %</td>
+          <td>One page of results. Not included in quantitative charts.</td>
+        </tr>
+        <tr>
+          <td>Reddit r/incremental_games</td>
+          <td>Qualitative sentiment (if available)</td>
+          <td>Low / unavailable</td>
+          <td>Returns 403 without OAuth. Qualitative only if cached.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- =========================================================
+       PIPELINE DESIGN
+  ========================================================= -->
+  <section id="pipeline">
+    <h2>Pipeline Design</h2>
+    <h3>Why Steam is the Spine</h3>
+    <p>
+      Steam is the dominant PC distribution platform for idle games and provides:
+      structured game metadata, user-derived tags (theme, mechanic, art style),
+      review counts and percentages, and price/business model data.
+      SteamSpy provides modeled owner counts which, despite their uncertainty,
+      are the only freely available proxy for reach on the platform.
+    </p>
+    <h3>Weighted Score Formula</h3>
+    <p>
+      <code>weighted_score = review_pct_positive × log(1 + total_owners)</code><br>
+      This balances quality (review%) with reach (owners). Biases toward popular titles —
+      a niche game with 100% reviews will score lower than a popular game with 85%.
+      Owner counts use SteamSpy estimates (medium confidence).
+    </p>
+    <h3>Theme / Mechanic / Art Style Classification</h3>
+    <p>
+      Tags are parsed from Steam store pages using a predefined taxonomy.
+      A game may belong to multiple themes or mechanics. Tag presence is binary
+      (present/absent); no weighting by tag position or steam-tag votes.
+    </p>
+    <h3>Underserved Flag (Gaps Module)</h3>
+    <p>
+      A theme is flagged underserved when:
+      <code>supply ≤ 25th percentile AND demand ≥ median demand</code>.
+      Thresholds are corpus-relative — adding more games shifts the percentile.
+      Treat as directional signal, not a hard market gap.
+    </p>
+    <h3>Update Cadence</h3>
+    <p>
+      Active: ≤ 30 days since last detected update.
+      Occasional: 31–120 days.
+      Abandoned: > 120 days or no update date found.
+      Update dates are scraped from Steam — missing dates default to "abandoned".
+    </p>
+    <h3>Exclusions</h3>
+    <ul>
+      <li><strong>Mobile (iOS/Android):</strong> No free/reliable structured data source.</li>
+      <li><strong>SteamDB:</strong> Excluded from this pipeline.</li>
+      <li><strong>News API:</strong> Excluded from this pipeline.</li>
+      <li><strong>Reddit sentiment:</strong> r/incremental_games top.json returns
+          403 without OAuth; not collected unless cached data is present.</li>
+    </ul>
+  </section>
+
+  <!-- =========================================================
+       KNOWN LIMITATIONS & CAVEATS
+  ========================================================= -->
+  <section id="caveats">
+    <h2>Known Limitations &amp; Caveats</h2>
+    {% if all_caveats %}
+    <ul class="caveat-list">
+      {% for c in all_caveats %}
+      <li>{{ c }}</li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>No caveats recorded.</p>
+    {% endif %}
+  </section>
+
+  <!-- =========================================================
+       CONFIDENCE RATINGS SUMMARY
+  ========================================================= -->
+  <section id="confidence">
+    <h2>Confidence Ratings Summary</h2>
+    <table>
+      <thead>
+        <tr><th>Metric</th><th>Confidence</th><th>Reason</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Steam review %</td>
+          <td>High</td>
+          <td>Direct from Steam; typically thousands of reviews per title.</td>
+        </tr>
+        <tr>
+          <td>Owner counts (SteamSpy)</td>
+          <td>Medium</td>
+          <td>Modeled estimates. ±30–50% error typical. Order-of-magnitude only.</td>
+        </tr>
+        <tr>
+          <td>Weighted score</td>
+          <td>Medium</td>
+          <td>Inherits SteamSpy uncertainty. Useful for ranking, not absolute values.</td>
+        </tr>
+        <tr>
+          <td>Theme / mechanic classification</td>
+          <td>Medium</td>
+          <td>User-applied Steam tags; inconsistent coverage across corpus.</td>
+        </tr>
+        <tr>
+          <td>Underserved flag</td>
+          <td>Low–Medium</td>
+          <td>Corpus-relative thresholds; sensitive to corpus completeness.</td>
+        </tr>
+        <tr>
+          <td>itch.io coverage</td>
+          <td>Low</td>
+          <td>One browse page; no owner/revenue data; not comparable to Steam.</td>
+        </tr>
+        <tr>
+          <td>Kongregate ratings</td>
+          <td>Low</td>
+          <td>1–5 star → %; not comparable to Steam review %. One page only.</td>
+        </tr>
+        <tr>
+          <td>Reddit sentiment</td>
+          <td>Low / unavailable</td>
+          <td>403 without OAuth; qualitative keyword counts only if cached.</td>
+        </tr>
+        <tr>
+          <td>Mobile coverage</td>
+          <td>Not covered</td>
+          <td>No free structured data source available.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+</main>
+<footer>
+  Idle/Incremental Game Market Analysis — <a href="index.html">Back to Report</a>
+</footer>
+</body>
+</html>

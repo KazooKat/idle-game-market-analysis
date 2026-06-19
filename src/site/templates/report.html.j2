@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Idle/Incremental Game Market Analysis</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+           margin: 0; background: #f8f9fa; color: #212529; }
+    header { background: #1a1a2e; color: #eee; padding: 2rem 2rem 1.5rem; }
+    header h1 { margin: 0 0 0.4rem; font-size: 1.8rem; }
+    header p  { margin: 0; opacity: 0.75; font-size: 0.95rem; }
+    nav { background: #16213e; padding: 0.5rem 2rem; }
+    nav a { color: #aac4ff; text-decoration: none; margin-right: 1.5rem; font-size: 0.9rem; }
+    nav a:hover { text-decoration: underline; }
+    main { max-width: 1200px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+    section { background: #fff; border-radius: 8px; padding: 1.5rem 2rem;
+              margin-bottom: 2rem; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+    h2 { font-size: 1.3rem; margin-top: 0; border-bottom: 2px solid #e9ecef; padding-bottom: 0.5rem; }
+    h3 { font-size: 1.05rem; color: #495057; }
+    .caption { font-size: 0.82rem; color: #6c757d; margin: 0.3rem 0 1rem;
+               border-left: 3px solid #dee2e6; padding-left: 0.6rem; }
+    .honesty { background: #fff3cd; border: 1px solid #ffc107; border-radius: 4px;
+               padding: 0.6rem 1rem; font-size: 0.85rem; color: #664d03; margin-bottom: 1rem; }
+    .stat-row { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; }
+    .stat { background: #f1f3f5; border-radius: 6px; padding: 0.75rem 1rem; min-width: 140px; }
+    .stat .val { font-size: 1.6rem; font-weight: 700; color: #1a1a2e; }
+    .stat .lbl { font-size: 0.78rem; color: #868e96; }
+    ul { padding-left: 1.2rem; }
+    li { margin-bottom: 0.3rem; }
+    .reddit-note { background: #e7f3ff; border-left: 4px solid #74b9ff;
+                   padding: 0.7rem 1rem; border-radius: 0 4px 4px 0;
+                   font-size: 0.88rem; color: #2d3436; margin-bottom: 1rem; }
+    footer { text-align: center; font-size: 0.78rem; color: #adb5bd;
+             padding: 2rem 0 1rem; }
+    .chart-wrap { margin: 1rem 0; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Idle / Incremental Game Market Analysis</h1>
+  <p>Steam catalogue analysis — data sourced from SteamSpy and Steam store pages.
+     Owner counts are modeled estimates, not verified sales.
+     Mobile not covered. See <a href="methodology.html" style="color:#aac4ff">Methodology</a> for full caveats.</p>
+</header>
+<nav>
+  <a href="#themes">Themes</a>
+  <a href="#gaps">Gaps</a>
+  <a href="#performance">Performance</a>
+  <a href="#features">Features</a>
+  <a href="#monetization">Monetization</a>
+  <a href="#art">Art Style</a>
+  <a href="#updates">Updates</a>
+  <a href="#trends">Trends</a>
+  <a href="#supplementary">Supplementary</a>
+  <a href="methodology.html">Methodology</a>
+</nav>
+<main>
+
+  <!-- =========================================================
+       EXECUTIVE SUMMARY
+  ========================================================= -->
+  <section id="summary">
+    <h2>Executive Summary</h2>
+    <div class="honesty">
+      <strong>Data honesty:</strong> All figures come from the analysis JSON.
+      Owner counts are SteamSpy estimates (modeled, not audited sales).
+      Mobile is not covered. Reddit sentiment is
+      {% if supp_reddit.available %}available (cached){% else %}unavailable (403/no OAuth){% endif %}.
+    </div>
+
+    <div class="stat-row">
+      {% if n_themes %}
+      <div class="stat">
+        <div class="val">{{ n_themes }}</div>
+        <div class="lbl">Themes identified</div>
+      </div>
+      {% endif %}
+      {% if supp_itch.count %}
+      <div class="stat">
+        <div class="val">{{ supp_itch.count }}</div>
+        <div class="lbl">itch.io titles (one page)</div>
+      </div>
+      {% endif %}
+      {% if supp_kong.count %}
+      <div class="stat">
+        <div class="val">{{ supp_kong.count }}</div>
+        <div class="lbl">Kongregate titles (one page)</div>
+      </div>
+      {% endif %}
+    </div>
+
+    <p>
+      This report analyses the idle/incremental game market using Steam as the
+      quantitative spine{% if n_themes %}, finding <strong>{{ n_themes }} distinct themes</strong>{% endif %}.
+      {% if top_theme and top_theme != '—' %}
+      The most represented theme in the corpus is <strong>{{ top_theme }}</strong>.
+      {% endif %}
+      {% if top_perf_theme and top_perf_theme != '—' %}
+      By weighted performance score (review % × log owners), <strong>{{ top_perf_theme }}</strong>
+      leads the ranking.
+      {% endif %}
+      {% if underserved_themes %}
+      Potentially underserved niches (low supply, high demand):
+      <strong>{{ underserved_themes | join(", ") }}</strong>.
+      {% endif %}
+    </p>
+
+    <h3>Building an Idler: What the Data Says</h3>
+    <ul>
+      {% if positive_features %}
+      <li><strong>Features that correlate with higher reviews:</strong>
+          {{ positive_features | join(", ") }}.
+          (Correlation, not causation; n may be small — see quality chart.)</li>
+      {% endif %}
+      {% if rising_themes %}
+      <li><strong>Rising themes</strong> (better recent-year reviews than older releases):
+          {{ rising_themes | join(", ") }}.</li>
+      {% endif %}
+      <li>Update cadence matters: the update-cadence chart shows whether active
+          upkeep correlates with review score in this corpus.</li>
+      <li>Price and business model: the monetization charts show how free-to-play
+          and paid tiers distribute across the catalogue.</li>
+      <li><em>Mobile is not covered. The above reflects Steam only.</em></li>
+    </ul>
+  </section>
+
+  <!-- =========================================================
+       THEMES
+  ========================================================= -->
+  <section id="themes">
+    <h2>Theme Landscape</h2>
+    <p class="caption">
+      n = number of games per theme. Owner counts are SteamSpy modeled estimates —
+      not verified sales. Weighted score = review% × log(1 + owners).
+    </p>
+    {% if figures.theme_bar %}
+    <div class="chart-wrap">{{ figures.theme_bar | safe }}</div>
+    {% else %}
+    <p><em>No theme data available.</em></p>
+    {% endif %}
+  </section>
+
+  <!-- =========================================================
+       GAPS
+  ========================================================= -->
+  <section id="gaps">
+    <h2>Supply vs Demand Gap Map</h2>
+    <p class="caption">
+      Supply = number of games (Steam corpus). Demand = weighted score (review% × log owners,
+      SteamSpy estimates). Red markers are underserved themes: supply ≤ 25th percentile
+      AND demand ≥ median. Confidence: medium — thresholds sensitive to corpus size.
+    </p>
+    {% if figures.gap_scatter %}
+    <div class="chart-wrap">{{ figures.gap_scatter | safe }}</div>
+    {% else %}
+    <p><em>No gap data available.</em></p>
+    {% endif %}
+  </section>
+
+  <!-- =========================================================
+       PERFORMANCE
+  ========================================================= -->
+  <section id="performance">
+    <h2>Theme Performance Ranking</h2>
+    <p class="caption">
+      Weighted score = review_pct_positive × log(1 + total_owners).
+      Owner counts are SteamSpy estimates. Themes with no owner data excluded.
+    </p>
+    {% if figures.performance_bar %}
+    <div class="chart-wrap">{{ figures.performance_bar | safe }}</div>
+    {% else %}
+    <p><em>No performance data available.</em></p>
+    {% endif %}
+  </section>
+
+  <!-- =========================================================
+       FEATURES
+  ========================================================= -->
+  <section id="features">
+    <h2>Feature Impact on Review Score</h2>
+    <p class="caption">
+      Delta = mean review % for games <em>with</em> the feature minus
+      mean review % for games <em>without</em>. Positive = feature correlates
+      with higher reviews. This is correlation only — small n may be unreliable.
+      Features: offline_progress, prestige (mechanic tags), is_free (price field).
+    </p>
+    {% if figures.feature_delta %}
+    <div class="chart-wrap">{{ figures.feature_delta | safe }}</div>
+    {% else %}
+    <p><em>No feature data available.</em></p>
+    {% endif %}
+  </section>
+
+  <!-- =========================================================
+       MONETIZATION
+  ========================================================= -->
+  <section id="monetization">
+    <h2>Monetization Analysis</h2>
+    <p class="caption">
+      Business model and price bucket breakdown. Owner counts are SteamSpy modeled
+      estimates. Prices from Steam store pages at scrape time — may not reflect
+      discounts or regional pricing.
+    </p>
+    {% if figures.monetization_bar %}
+    <h3>Business Models</h3>
+    <div class="chart-wrap">{{ figures.monetization_bar | safe }}</div>
+    {% endif %}
+    {% if figures.price_buckets %}
+    <h3>Price Buckets (USD)</h3>
+    <div class="chart-wrap">{{ figures.price_buckets | safe }}</div>
+    {% endif %}
+    {% if not figures.monetization_bar and not figures.price_buckets %}
+    <p><em>No monetization data available.</em></p>
+    {% endif %}
+  </section>
+
+  <!-- =========================================================
+       ART STYLE
+  ========================================================= -->
+  <section id="art">
+    <h2>Art Style Distribution</h2>
+    <p class="caption">
+      Art style counts and weighted performance. Owner counts are SteamSpy estimates.
+      Art style classification is tag-based (may overlap / be inconsistent).
+    </p>
+    {% if figures.art_bar %}
+    <div class="chart-wrap">{{ figures.art_bar | safe }}</div>
+    {% else %}
+    <p><em>No art style data available.</em></p>
+    {% endif %}
+  </section>
+
+  <!-- =========================================================
+       UPDATES
+  ========================================================= -->
+  <section id="updates">
+    <h2>Update Cadence</h2>
+    <p class="caption">
+      Active ≤ 30 days since last update; Occasional 31–120 days; Abandoned > 120 days
+      or no update detected. Update dates from Steam store scrape.
+    </p>
+    {% if figures.update_cadence %}
+    <div class="chart-wrap">{{ figures.update_cadence | safe }}</div>
+    {% else %}
+    <p><em>No update cadence data available.</em></p>
+    {% endif %}
+  </section>
+
+  <!-- =========================================================
+       TRENDS
+  ========================================================= -->
+  <section id="trends">
+    <h2>Release Trends</h2>
+    <p class="caption">
+      Releases per year from Steam release dates.
+      {% if n_trends_years %}Covers {{ n_trends_years }} calendar years.{% endif %}
+      Median review % per year shown on secondary axis.
+    </p>
+    {% if figures.releases_per_year %}
+    <div class="chart-wrap">{{ figures.releases_per_year | safe }}</div>
+    {% else %}
+    <p><em>No trend data available.</em></p>
+    {% endif %}
+  </section>
+
+  <!-- =========================================================
+       SUPPLEMENTARY SOURCES
+  ========================================================= -->
+  <section id="supplementary">
+    <h2>Supplementary Sources</h2>
+    <div class="honesty">
+      Supplementary sources are informational only — they are <strong>not</strong>
+      combined with Steam data in the charts above (different confidence levels and
+      data shapes prevent honest cross-source comparison).
+    </div>
+
+    <h3>itch.io</h3>
+    {% if supp_itch %}
+    <ul>
+      <li>Titles found (one browse page): <strong>{{ supp_itch.count | default('n/a') }}</strong></li>
+      <li>Free titles: <strong>{{ supp_itch.free_count | default('n/a') }}</strong>
+          ({{ supp_itch.free_pct | default('n/a') }}%)</li>
+      {% if supp_itch.top_tags %}
+      <li>Top tags: {{ supp_itch.top_tags | map(attribute=0) | list | join(", ") }}</li>
+      {% endif %}
+    </ul>
+    <p class="caption">itch.io provides no owner/revenue data — coverage counts only.
+    Data is one-page scrape, not full catalogue.</p>
+    {% else %}
+    <p><em>itch.io data not available.</em></p>
+    {% endif %}
+
+    <h3>Kongregate</h3>
+    {% if supp_kong %}
+    <ul>
+      <li>Titles found (one page): <strong>{{ supp_kong.count | default('n/a') }}</strong></li>
+      <li>Rated titles: <strong>{{ supp_kong.rated_count | default('n/a') }}</strong></li>
+      {% if supp_kong.mean_rating_pct is not none %}
+      <li>Mean rating (star→%): <strong>{{ supp_kong.mean_rating_pct }}%</strong>
+          <em>(low confidence — not comparable to Steam review %)</em></li>
+      {% endif %}
+      {% if supp_kong.top_tags %}
+      <li>Top tags: {{ supp_kong.top_tags | map(attribute=0) | list | join(", ") }}</li>
+      {% endif %}
+    </ul>
+    <p class="caption">Kongregate ratings are 1–5 stars mapped to %; NOT comparable
+    to Steam review percentages. Low confidence.</p>
+    {% else %}
+    <p><em>Kongregate data not available.</em></p>
+    {% endif %}
+
+    <h3>Reddit (r/incremental_games)</h3>
+    <div class="reddit-note">
+      {% if supp_reddit %}
+        {{ supp_reddit.note | default('Reddit data status unknown.') }}
+        {% if supp_reddit.available and supp_reddit.sentiment %}
+        <br>Sentiment counts:
+        {% for cat, count in supp_reddit.sentiment.items() %}
+          <strong>{{ cat }}</strong>: {{ count }}{% if not loop.last %}, {% endif %}
+        {% endfor %}
+        {% endif %}
+      {% else %}
+        Reddit data unavailable.
+      {% endif %}
+    </div>
+
+    {% if supp_caveats %}
+    <h3>Source Caveats</h3>
+    <ul>
+      {% for c in supp_caveats %}
+      <li>{{ c }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </section>
+
+</main>
+<footer>
+  Idle/Incremental Game Market Analysis &mdash; Steam spine analysis.
+  Owner counts: SteamSpy estimates. Mobile not covered.
+  <a href="methodology.html">Full methodology &amp; caveats</a>
+</footer>
+</body>
+</html>
