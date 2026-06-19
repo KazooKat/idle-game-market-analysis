@@ -17,6 +17,7 @@ import json
 import pathlib
 import sys
 import warnings
+from datetime import datetime, timezone
 
 import src.analysis.topics as _topics
 import src.analysis.performance as _performance
@@ -72,7 +73,19 @@ def main(
 
     df = load_master(master_path)
 
-    results: dict[str, str] = {}
+    # -- Dataset summary (written unconditionally, before per-module loop) --
+    dataset_summary = {
+        "total_games": int(len(df)),
+        "with_reviews": int(df["review_pct_positive"].notna().sum()),
+        "with_owner_est": int(df["owners_est"].notna().sum()),
+        "themed": int(df["theme"].notna().sum()),
+        "generated_utc": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+    }
+    dataset_file = out_path / "dataset.json"
+    with open(dataset_file, "w", encoding="utf-8") as fh:
+        json.dump(dataset_summary, fh, ensure_ascii=False, indent=2)
+
+    results: dict[str, str] = {"dataset": str(dataset_file)}
 
     for name, run_fn in REGISTRY:
         out_file = out_path / f"{name}.json"

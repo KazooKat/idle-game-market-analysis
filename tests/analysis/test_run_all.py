@@ -64,18 +64,18 @@ def master_parquet(master_df, tmp_path):
 
 
 def test_run_all_writes_nine_json_files(master_parquet, tmp_path):
-    """main() must write exactly one JSON file per module (9 total)."""
+    """main() must write dataset.json + one JSON file per module (10 total)."""
     from src.analysis.run_all import main
 
     out_dir = str(tmp_path / "analysis")
     result = main(master_path=master_parquet, out_dir=out_dir)
 
-    # Returned dict must have 9 entries
-    assert len(result) == 9, f"Expected 9 entries, got {len(result)}: {list(result.keys())}"
+    # Returned dict must have 10 entries: dataset + 9 modules
+    assert len(result) == 10, f"Expected 10 entries, got {len(result)}: {list(result.keys())}"
 
-    # 9 files must exist on disk
+    # 10 files must exist on disk
     written = list(pathlib.Path(out_dir).glob("*.json"))
-    assert len(written) == 9, f"Expected 9 JSON files, got {len(written)}"
+    assert len(written) == 10, f"Expected 10 JSON files, got {len(written)}"
 
 
 def test_run_all_files_are_valid_json(master_parquet, tmp_path):
@@ -92,13 +92,14 @@ def test_run_all_files_are_valid_json(master_parquet, tmp_path):
 
 
 def test_run_all_module_names_match_registry(master_parquet, tmp_path):
-    """The returned dict keys must be the canonical module names in order."""
+    """The returned dict keys must be dataset first, then canonical module names."""
     from src.analysis.run_all import main, REGISTRY
 
     out_dir = str(tmp_path / "analysis")
     result = main(master_path=master_parquet, out_dir=out_dir)
 
-    expected_names = [name for name, _ in REGISTRY]
+    registry_names = [name for name, _ in REGISTRY]
+    expected_names = ["dataset"] + registry_names
     assert list(result.keys()) == expected_names
 
 
@@ -112,3 +113,36 @@ def test_run_all_creates_out_dir_if_missing(master_parquet, tmp_path):
     main(master_path=master_parquet, out_dir=out_dir)
 
     assert pathlib.Path(out_dir).exists()
+
+
+def test_run_all_writes_dataset_json(master_parquet, master_df, tmp_path):
+    """main() must write dataset.json with total_games == len(master_df) and all required keys."""
+    from src.analysis.run_all import main
+
+    out_dir = str(tmp_path / "analysis")
+    result = main(master_path=master_parquet, out_dir=out_dir)
+
+    # dataset key must be present in the returned dict
+    assert "dataset" in result, "main() did not return a 'dataset' key"
+
+    dataset_path = pathlib.Path(result["dataset"])
+    assert dataset_path.exists(), f"dataset.json was not written to {dataset_path}"
+
+    with open(dataset_path, encoding="utf-8") as fh:
+        data = json.load(fh)
+
+    # total_games must equal the actual row count of the synthetic DataFrame
+    assert data["total_games"] == len(master_df), (
+        f"Expected total_games={len(master_df)}, got {data['total_games']}"
+    )
+
+    # All required keys must be present
+    for key in ("total_games", "with_reviews", "with_owner_est", "themed", "generated_utc"):
+        assert key in data, f"dataset.json missing key '{key}'"
+
+    # Values must be JSON-safe plain types (int or str), not numpy types
+    assert isinstance(data["total_games"], int)
+    assert isinstance(data["with_reviews"], int)
+    assert isinstance(data["with_owner_est"], int)
+    assert isinstance(data["themed"], int)
+    assert isinstance(data["generated_utc"], str)

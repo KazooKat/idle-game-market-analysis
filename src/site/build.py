@@ -504,9 +504,13 @@ def build_site(analysis_dir: str = "data/analysis", out: str = "docs") -> None:
     trends_years = _safe_list(analysis.get("trends", {}), "by_year")
     rising_themes = (analysis.get("trends") or {}).get("rising_themes", [])
 
+    # -- Dataset summary (guards for absence in older runs) --
+    ctx_dataset = analysis.get("dataset", {})
+
     # -- Jinja2 context --
     ctx: dict[str, Any] = {
         "figures": figures,
+        "dataset": ctx_dataset,
         # supplementary
         "supp_itch": supp_itch,
         "supp_kong": supp_kong,

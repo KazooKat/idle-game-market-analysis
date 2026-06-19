@@ -62,6 +62,29 @@
   ========================================================= -->
   <section id="summary">
     <h2>Executive Summary</h2>
+    {% if dataset and dataset.total_games %}
+    <div class="stat-row">
+      <div class="stat">
+        <div class="val">{{ dataset.total_games }}</div>
+        <div class="lbl">Idle/incremental games analyzed</div>
+      </div>
+      {% if dataset.with_reviews %}
+      <div class="stat">
+        <div class="val">{{ dataset.with_reviews }}</div>
+        <div class="lbl">With Steam review data</div>
+      </div>
+      {% endif %}
+      {% if dataset.themed %}
+      <div class="stat">
+        <div class="val">{{ dataset.themed }}</div>
+        <div class="lbl">Classified into themes</div>
+      </div>
+      {% endif %}
+    </div>
+    <p class="caption">Dataset generated {{ dataset.generated_utc }}.
+      {{ dataset.with_reviews }} games have Steam review data;
+      {{ dataset.themed }} classified into themes.</p>
+    {% endif %}
     <div class="honesty">
       <strong>Data honesty:</strong> All figures come from the analysis JSON.
       Owner counts are SteamSpy estimates (modeled, not audited sales).

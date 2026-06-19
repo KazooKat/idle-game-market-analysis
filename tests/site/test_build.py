@@ -129,6 +129,14 @@ TRENDS_JSON = {
     "rising_themes": ["space"],
 }
 
+DATASET_JSON = {
+    "total_games": 123,
+    "with_reviews": 100,
+    "with_owner_est": 120,
+    "themed": 80,
+    "generated_utc": "2026-06-19",
+}
+
 
 @pytest.fixture()
 def analysis_dir(tmp_path: pathlib.Path) -> pathlib.Path:
@@ -145,6 +153,7 @@ def analysis_dir(tmp_path: pathlib.Path) -> pathlib.Path:
         "art.json": ART_JSON,
         "updates.json": UPDATES_JSON,
         "trends.json": TRENDS_JSON,
+        "dataset.json": DATASET_JSON,
     }
     for name, data in files.items():
         (d / name).write_text(json.dumps(data), encoding="utf-8")
@@ -251,3 +260,31 @@ def test_make_figures_returns_html_divs(analysis_dir):
     for name, html in result.items():
         assert isinstance(html, str), f"figure {name!r} is not a string"
         assert len(html) > 0, f"figure {name!r} is empty"
+
+
+def test_index_contains_dataset_total_games(analysis_dir, out_dir):
+    """index.html must render the dataset total_games count (123 from fixture)."""
+    from src.site.build import build_site
+
+    build_site(analysis_dir=str(analysis_dir), out=str(out_dir))
+    content = (out_dir / "index.html").read_text(encoding="utf-8")
+    assert "123" in content, (
+        "index.html does not contain dataset.total_games value '123'"
+    )
+
+
+def test_build_site_no_crash_without_dataset(tmp_path):
+    """build_site must not crash when dataset.json is absent (older runs)."""
+    d = tmp_path / "analysis_no_dataset"
+    d.mkdir()
+    (d / "topics.json").write_text(json.dumps(TOPICS_JSON), encoding="utf-8")
+    (d / "gaps.json").write_text(json.dumps(GAPS_JSON), encoding="utf-8")
+    out = tmp_path / "out_no_dataset"
+
+    from src.site.build import build_site
+
+    build_site(analysis_dir=str(d), out=str(out))
+    assert (out / "index.html").exists()
+    # Headline must be absent (no dataset key) — no crash
+    content = (out / "index.html").read_text(encoding="utf-8")
+    assert "games analyzed" not in content
