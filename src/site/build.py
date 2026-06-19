@@ -350,6 +350,45 @@ def _fig_update_cadence(analysis: dict) -> str | None:
     return _fig_to_div(fig)
 
 
+def _fig_naming_bar(analysis: dict) -> str | None:
+    """Bar chart: naming pattern count and mean review % per pattern."""
+    rows = _safe_list(analysis.get("naming", {}), "by_pattern")
+    if not rows:
+        return None
+
+    patterns = [r.get("pattern", "") for r in rows]
+    counts = [r.get("count", 0) or 0 for r in rows]
+    scores = [r.get("mean_positive") for r in rows]
+
+    fig = go.Figure()
+    fig.add_trace(go.Bar(
+        name="Count",
+        x=patterns,
+        y=counts,
+        marker_color="slateblue",
+        yaxis="y",
+    ))
+    valid_scores = [s for s in scores if s is not None]
+    if valid_scores:
+        fig.add_trace(go.Scatter(
+            name="Mean review %",
+            x=patterns,
+            y=scores,
+            mode="lines+markers",
+            marker=dict(color="darkorange", size=8),
+            yaxis="y2",
+        ))
+    fig.update_layout(
+        title="Naming Patterns: title keyword match (idle_x / x_clicker / creative)",
+        xaxis_title="Pattern",
+        yaxis=dict(title="Number of games"),
+        yaxis2=dict(title="Mean review %", overlaying="y", side="right"),
+        height=400,
+        legend=dict(x=0.01, y=0.99),
+    )
+    return _fig_to_div(fig)
+
+
 def _fig_releases_per_year(analysis: dict) -> str | None:
     """Line chart: releases per year."""
     rows = _safe_list(analysis.get("trends", {}), "by_year")
@@ -418,6 +457,7 @@ def make_figures(analysis: dict) -> dict[str, str]:
         ("art_bar", _fig_art_bar),
         ("update_cadence", _fig_update_cadence),
         ("releases_per_year", _fig_releases_per_year),
+        ("naming_bar", _fig_naming_bar),
     ]
 
     figures: dict[str, str] = {}
@@ -478,7 +518,14 @@ def build_site(analysis_dir: str = "data/analysis", out: str = "docs") -> None:
         "itch.io provides no owner/revenue data — coverage counts only.",
         "Scrapers parse static HTML/JSON-LD; counts reflect one page of results,"
         " not the full catalogue.",
-        "SteamDB and News API were excluded from this pipeline.",
+        "SteamDB was excluded from this pipeline (Cloudflare / ToS barriers)."
+        " The Steam News API IS used for update cadence detection (~2,169 games).",
+        "Theme and mechanic classifications are derived from short description"
+        " keyword matching (word-boundary regex), NOT from Steam tags — per-game"
+        " tags were unavailable from the SteamSpy endpoint. Medium-low confidence;"
+        " treat as directional signals only.",
+        "Art style has no data source in this pipeline (depended on per-game Steam tags,"
+        " which were unavailable). Art style is null for all games.",
         "Weighted score = review_pct_positive × log(1 + total_owners);"
         " biases toward popular games with high approval.",
     ]

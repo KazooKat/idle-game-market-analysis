@@ -54,9 +54,10 @@
       <tbody>
         <tr>
           <td>Steam store pages</td>
-          <td>Primary spine — game metadata, tags, review scores</td>
+          <td>Primary spine — game metadata, review scores, short descriptions</td>
           <td>High (review % from thousands of reviews)</td>
-          <td>Tags are user-applied; not all games tagged consistently.</td>
+          <td>Per-game tags were not available via the SteamSpy API endpoint used;
+              themes and mechanics are derived from short descriptions instead (see below).</td>
         </tr>
         <tr>
           <td>SteamSpy</td>
@@ -95,8 +96,10 @@
     <h3>Why Steam is the Spine</h3>
     <p>
       Steam is the dominant PC distribution platform for idle games and provides:
-      structured game metadata, user-derived tags (theme, mechanic, art style),
-      review counts and percentages, and price/business model data.
+      structured game metadata, short descriptions (used for theme/mechanic
+      keyword classification), review counts and percentages, and price/business
+      model data. Per-game Steam tags were not available from the SteamSpy
+      endpoint used — see the Theme / Mechanic Classification section below.
       SteamSpy provides modeled owner counts which, despite their uncertainty,
       are the only freely available proxy for reach on the platform.
     </p>
@@ -107,11 +110,24 @@
       a niche game with 100% reviews will score lower than a popular game with 85%.
       Owner counts use SteamSpy estimates (medium confidence).
     </p>
-    <h3>Theme / Mechanic / Art Style Classification</h3>
+    <h3>Theme / Mechanic Classification</h3>
     <p>
-      Tags are parsed from Steam store pages using a predefined taxonomy.
-      A game may belong to multiple themes or mechanics. Tag presence is binary
-      (present/absent); no weighting by tag position or steam-tag votes.
+      <strong>Important:</strong> Per-game Steam tags were <em>not</em> available
+      from the SteamSpy API endpoint used in this pipeline — the tag response
+      returned no per-game data for any of the 3,479 games. Themes and mechanics
+      are therefore derived entirely from each game's <strong>short description</strong>
+      text via keyword word-boundary matching (a medium/low-confidence heuristic).
+      This approach can mis-classify games whose descriptions contain thematic words
+      incidentally (e.g. a description mentioning "space" in a different context).
+      A game may be assigned to multiple themes or mechanics. Results should be
+      treated as directional signals, not authoritative genre classifications.
+    </p>
+    <h3>Art Style</h3>
+    <p>
+      Art style classification depended on per-game Steam tags, which were not
+      available (see above). As a result, <strong>art_style is null for all games</strong>
+      in this dataset — the Art Style section of the report shows no data.
+      This is a known limitation of the current pipeline, not a rendering error.
     </p>
     <h3>Underserved Flag (Gaps Module)</h3>
     <p>
@@ -127,11 +143,18 @@
       Abandoned: > 120 days or no update date found.
       Update dates are scraped from Steam — missing dates default to "abandoned".
     </p>
+    <h3>Update Cadence Data Source</h3>
+    <p>
+      Update cadence is derived from the <strong>Steam News API</strong>, which
+      is used to detect the most recent news/patch post for 2,169 games.
+      A game with no news entry within the last 120 days is classified as
+      "abandoned." This is an approximation — news posts do not always correspond
+      to gameplay updates.
+    </p>
     <h3>Exclusions</h3>
     <ul>
       <li><strong>Mobile (iOS/Android):</strong> No free/reliable structured data source.</li>
-      <li><strong>SteamDB:</strong> Excluded from this pipeline.</li>
-      <li><strong>News API:</strong> Excluded from this pipeline.</li>
+      <li><strong>SteamDB:</strong> Excluded from this pipeline (Cloudflare / ToS barriers).</li>
       <li><strong>Reddit sentiment:</strong> r/incremental_games top.json returns
           403 without OAuth; not collected unless cached data is present.</li>
     </ul>
@@ -180,8 +203,10 @@
         </tr>
         <tr>
           <td>Theme / mechanic classification</td>
-          <td>Medium</td>
-          <td>User-applied Steam tags; inconsistent coverage across corpus.</td>
+          <td>Medium–Low</td>
+          <td>Derived from short description keyword matching (word-boundary regex);
+              per-game Steam tags were unavailable. Can over- or under-classify.
+              Art style has no data source and is null for all games.</td>
         </tr>
         <tr>
           <td>Underserved flag</td>

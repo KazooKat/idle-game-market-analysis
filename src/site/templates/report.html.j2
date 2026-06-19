@@ -52,6 +52,7 @@
   <a href="#art">Art Style</a>
   <a href="#updates">Updates</a>
   <a href="#trends">Trends</a>
+  <a href="#naming">Naming</a>
   <a href="#supplementary">Supplementary</a>
   <a href="methodology.html">Methodology</a>
 </nav>
@@ -117,7 +118,8 @@
       This report analyses the idle/incremental game market using Steam as the
       quantitative spine{% if n_themes %}, finding <strong>{{ n_themes }} distinct themes</strong>{% endif %}.
       {% if top_theme and top_theme != '—' %}
-      The most represented theme in the corpus is <strong>{{ top_theme }}</strong>.
+      The most represented theme in the corpus is <strong>{{ top_theme }}</strong>
+      (classified by description keyword matching — medium-low confidence; see Methodology).
       {% endif %}
       {% if top_perf_theme and top_perf_theme != '—' %}
       By weighted performance score (review % × log owners), <strong>{{ top_perf_theme }}</strong>
@@ -157,6 +159,14 @@
       n = number of games per theme. Owner counts are SteamSpy modeled estimates —
       not verified sales. Weighted score = review% × log(1 + owners).
     </p>
+    <div class="honesty">
+      <strong>Theme caveat (medium-low confidence):</strong> Themes are classified
+      by keyword word-boundary matching against each game's <em>short description</em>
+      only — per-game Steam tags were not available from the data source used.
+      This is a heuristic: a game may be mis-classified if its description contains
+      thematic words incidentally. Treat theme counts as directional signals, not
+      authoritative genre data. See <a href="methodology.html">Methodology</a> for details.
+    </div>
     {% if figures.theme_bar %}
     <div class="chart-wrap">{{ figures.theme_bar | safe }}</div>
     {% else %}
@@ -244,13 +254,16 @@
   <section id="art">
     <h2>Art Style Distribution</h2>
     <p class="caption">
-      Art style counts and weighted performance. Owner counts are SteamSpy estimates.
-      Art style classification is tag-based (may overlap / be inconsistent).
+      Art style classification depended on per-game Steam tags, which were not
+      available from the data source used in this pipeline. Art style is null
+      for all 3,479 games — no art style chart can be rendered. This is a known
+      pipeline limitation, not a rendering error. See
+      <a href="methodology.html">Methodology</a> for details.
     </p>
     {% if figures.art_bar %}
     <div class="chart-wrap">{{ figures.art_bar | safe }}</div>
     {% else %}
-    <p><em>No art style data available.</em></p>
+    <p><em>Art style data unavailable — per-game Steam tags were not accessible via the SteamSpy endpoint used. Art style is null for all games in this dataset.</em></p>
     {% endif %}
   </section>
 
@@ -284,6 +297,24 @@
     <div class="chart-wrap">{{ figures.releases_per_year | safe }}</div>
     {% else %}
     <p><em>No trend data available.</em></p>
+    {% endif %}
+  </section>
+
+  <!-- =========================================================
+       NAMING PATTERNS
+  ========================================================= -->
+  <section id="naming">
+    <h2>Naming Patterns</h2>
+    <p class="caption">
+      Pattern counts and mean review % by title keyword match. Patterns are derived
+      from game title keywords only (e.g. titles starting with "Idle …" = idle_x;
+      titles ending in "… Clicker" = x_clicker; all others = creative). This is a
+      surface-level heuristic — not a validated genre classification.
+    </p>
+    {% if figures.naming_bar %}
+    <div class="chart-wrap">{{ figures.naming_bar | safe }}</div>
+    {% else %}
+    <p><em>No naming pattern data available.</em></p>
     {% endif %}
   </section>
 

@@ -137,6 +137,14 @@ DATASET_JSON = {
     "generated_utc": "2026-06-19",
 }
 
+NAMING_JSON = {
+    "by_pattern": [
+        {"pattern": "idle_x", "count": 50, "mean_positive": 62.0},
+        {"pattern": "x_clicker", "count": 30, "mean_positive": 64.0},
+        {"pattern": "creative", "count": 200, "mean_positive": 76.0},
+    ]
+}
+
 
 @pytest.fixture()
 def analysis_dir(tmp_path: pathlib.Path) -> pathlib.Path:
@@ -155,6 +163,7 @@ def analysis_dir(tmp_path: pathlib.Path) -> pathlib.Path:
         "trends.json": TRENDS_JSON,
         "dataset.json": DATASET_JSON,
     }
+    files["naming.json"] = NAMING_JSON
     for name, data in files.items():
         (d / name).write_text(json.dumps(data), encoding="utf-8")
     return d
@@ -288,3 +297,41 @@ def test_build_site_no_crash_without_dataset(tmp_path):
     # Headline must be absent (no dataset key) — no crash
     content = (out / "index.html").read_text(encoding="utf-8")
     assert "games analyzed" not in content
+
+
+def test_make_figures_naming_bar_present(analysis_dir):
+    """make_figures must build a naming_bar figure when naming.json is present."""
+    import json as _json
+
+    from src.site.build import make_figures
+
+    analysis = {}
+    for p in analysis_dir.glob("*.json"):
+        analysis[p.stem] = _json.loads(p.read_text(encoding="utf-8"))
+
+    result = make_figures(analysis)
+    assert "naming_bar" in result, (
+        f"Expected 'naming_bar' figure in make_figures output; got keys: {list(result.keys())}"
+    )
+    assert len(result["naming_bar"]) > 0
+
+
+def test_index_contains_naming_section(analysis_dir, out_dir):
+    """index.html must contain the Naming Patterns section when naming.json is present."""
+    from src.site.build import build_site
+
+    build_site(analysis_dir=str(analysis_dir), out=str(out_dir))
+    content = (out_dir / "index.html").read_text(encoding="utf-8")
+    assert "Naming Patterns" in content, (
+        "index.html does not contain 'Naming Patterns' section"
+    )
+
+
+def test_make_figures_naming_bar_absent_when_no_naming_data(tmp_path):
+    """make_figures must not crash and must NOT include naming_bar when naming.json is absent."""
+    from src.site.build import make_figures
+
+    analysis = {"topics": TOPICS_JSON}
+    result = make_figures(analysis)
+    # Should not crash; naming_bar simply won't be in the result
+    assert "naming_bar" not in result

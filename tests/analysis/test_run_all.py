@@ -115,6 +115,46 @@ def test_run_all_creates_out_dir_if_missing(master_parquet, tmp_path):
     assert pathlib.Path(out_dir).exists()
 
 
+def test_run_all_error_fallback_writes_error_json_and_continues(master_parquet, tmp_path, monkeypatch):
+    """If one module raises, its JSON contains {error:...}, others still written, main() doesn't raise."""
+    import src.analysis.run_all as _run_all
+
+    # Patch the first module in the registry to raise
+    original_registry = list(_run_all.REGISTRY)
+    failing_name = original_registry[0][0]
+
+    def _boom(df):
+        raise ValueError("simulated module failure")
+
+    patched = [(_run_all.REGISTRY[0][0], _boom)] + original_registry[1:]
+    monkeypatch.setattr(_run_all, "REGISTRY", patched)
+
+    out_dir = str(tmp_path / "analysis_err")
+
+    # Must not raise
+    result = _run_all.main(master_path=master_parquet, out_dir=out_dir)
+
+    # The failing module's JSON must contain {"error": ...}
+    failing_path = pathlib.Path(result[failing_name])
+    assert failing_path.exists(), f"Expected {failing_path} to be written"
+    with open(failing_path, encoding="utf-8") as fh:
+        failing_data = json.load(fh)
+    assert "error" in failing_data, (
+        f"Expected 'error' key in {failing_name}.json, got: {failing_data}"
+    )
+    assert "simulated module failure" in failing_data["error"]
+
+    # All other modules must still have been written (no error key for them)
+    for name, _ in original_registry[1:]:
+        p = pathlib.Path(result[name])
+        assert p.exists(), f"Expected {p} to exist even after module '{failing_name}' failed"
+        with open(p, encoding="utf-8") as fh:
+            data = json.load(fh)
+        assert "error" not in data, (
+            f"{name}.json has unexpected 'error' key: {data}"
+        )
+
+
 def test_run_all_writes_dataset_json(master_parquet, master_df, tmp_path):
     """main() must write dataset.json with total_games == len(master_df) and all required keys."""
     from src.analysis.run_all import main

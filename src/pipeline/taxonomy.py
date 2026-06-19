@@ -1,8 +1,11 @@
+import re as _re
+
+
 def classify(text: str, tags: list[str], keyword_map: dict) -> list[str]:
     hay = (text or "").lower() + " " + " ".join(t.lower() for t in (tags or []))
     hits = []
     for cat, words in keyword_map.items():
-        if any(w.lower() in hay for w in words):
+        if any(_re.search(r"\b" + _re.escape(w.lower()) + r"\b", hay) for w in words):
             hits.append(cat)
     return hits
 
