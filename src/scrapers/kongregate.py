@@ -6,12 +6,14 @@ embeds a JSON-LD <script type="application/ld+json"> block containing an
 ItemList of up to 50 games -- this IS present in static HTML and is parsed here.
 
 Rating note: Kongregate uses a 1-5 star scale (aggregateRating.ratingValue).
-We convert it to review_pct_positive with confidence="low" because the scale
-is not directly comparable to Steam's thumbs-up percentage.
+We convert it to review_pct_positive with review_confidence="low" because the
+scale is not directly comparable to Steam's thumbs-up percentage.
   formula: pct = (ratingValue - 1) / 4 * 100   (maps 1→0%, 5→100%)
+
+Owner data: Kongregate provides no owner/CCU data, so owners_confidence is
+always None.
 """
 import json
-import re
 from bs4 import BeautifulSoup
 
 from src.common.http import cached_get
@@ -27,30 +29,37 @@ def fetch_listing(refresh: bool = False) -> str:
     return r.text
 
 
+def _find_item_list(html: str) -> dict | None:
+    """Scan ALL JSON-LD script blocks and return the first ItemList node found.
+
+    Real Kongregate pages emit multiple <script type="application/ld+json">
+    tags (e.g. a WebSite block AND an ItemList block). find_all iterates every
+    block; malformed JSON is skipped gracefully.
+    """
+    soup = BeautifulSoup(html, "lxml")
+    for tag in soup.find_all("script", {"type": "application/ld+json"}):
+        try:
+            data = json.loads(tag.string or "")
+        except (json.JSONDecodeError, TypeError):
+            continue
+        if not isinstance(data, dict):
+            continue
+        graph = data.get("@graph", [])
+        item_list = next(
+            (node for node in graph if node.get("@type") == "ItemList"),
+            None,
+        )
+        if item_list is not None:
+            return item_list
+    return None
+
+
 def parse_listing(html: str) -> list[dict]:
     """Parse JSON-LD ItemList from Kongregate category page HTML.
 
     Returns one partial row dict per game, or [] if no ItemList found.
     """
-    soup = BeautifulSoup(html, "lxml")
-
-    # Find the JSON-LD script block
-    ld_tag = soup.find("script", {"type": "application/ld+json"})
-    if not ld_tag:
-        return []
-
-    try:
-        data = json.loads(ld_tag.string or "")
-    except (json.JSONDecodeError, TypeError):
-        return []
-
-    graph = data.get("@graph", []) if isinstance(data, dict) else []
-
-    # Find the ItemList node
-    item_list = next(
-        (node for node in graph if node.get("@type") == "ItemList"),
-        None,
-    )
+    item_list = _find_item_list(html)
     if item_list is None:
         return []
 
@@ -71,16 +80,18 @@ def parse_listing(html: str) -> list[dict]:
         genre = game.get("genre")
         tags: list[str] = [genre] if genre else []
 
-        # aggregateRating: 1-5 star scale → 0-100 pct (confidence low)
+        # aggregateRating: 1-5 star scale → 0-100 pct
+        # review_confidence="low" because star scale != Steam thumbs-up %
+        # owners_confidence is always None (Kongregate provides no owner data)
         review_pct: float | None = None
-        confidence: str | None = None
+        review_confidence: str | None = None
         agg = game.get("aggregateRating")
         if agg:
             try:
                 rv = float(agg["ratingValue"])
                 # map [1, 5] → [0, 100]
                 review_pct = round((rv - 1.0) / 4.0 * 100.0, 1)
-                confidence = "low"
+                review_confidence = "low"
             except (KeyError, ValueError, TypeError):
                 pass
 
@@ -91,7 +102,8 @@ def parse_listing(html: str) -> list[dict]:
             "platform": "web",
             "tags": tags,
             "review_pct_positive": review_pct,
-            "owners_confidence": confidence,
+            "review_confidence": review_confidence,
+            "owners_confidence": None,
         })
 
     return rows

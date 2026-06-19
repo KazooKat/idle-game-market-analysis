@@ -37,14 +37,17 @@ def test_parse_listing_required_fields():
 
 
 def test_parse_listing_rating_field():
-    """aggregateRating in JSON-LD should map to review_pct_positive (confidence low)."""
+    """aggregateRating maps to review_pct_positive; review_confidence='low'; owners_confidence=None."""
     html = FIXTURE.read_text(encoding="utf-8")
     rows = parse_listing(html)
     row = rows[0]  # Incremancer has ratingValue 4.53, ratingCount 29625
     assert row.get("review_pct_positive") is not None, "review_pct_positive should be present"
     pct = row["review_pct_positive"]
     assert 0.0 <= pct <= 100.0, f"review_pct_positive out of range: {pct}"
-    assert row.get("owners_confidence") == "low"
+    # review_confidence carries the star-rating softness signal
+    assert row.get("review_confidence") == "low", "review_confidence should be 'low' for rated game"
+    # owners_confidence must always be None (Kongregate provides no owner data)
+    assert row.get("owners_confidence") is None, "owners_confidence must be None (no owner data)"
 
 
 def test_parse_listing_known_game():
