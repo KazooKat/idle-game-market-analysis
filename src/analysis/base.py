@@ -59,11 +59,6 @@ def weighted_quality(df: pd.DataFrame, by: str) -> pd.DataFrame:
     # Safely cast owners_est to float (handles nullable Int64 and NaN).
     df["_owners_f"] = df["owners_est"].astype("float64")
 
-    # Weighted score numerator: score * owners for trusted rows, else 0.
-    # Use 0 for NaN review_pct_positive so they don't contribute weight.
-    df["_score_x_owners"] = (
-        df["review_pct_positive"].fillna(0.0) * df["_owners_f"] * df["_trusted"]
-    )
     # Owner weight for trusted rows only (used as denominator).
     df["_weight"] = df["_owners_f"] * df["_trusted"]
 

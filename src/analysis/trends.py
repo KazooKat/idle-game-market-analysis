@@ -67,7 +67,7 @@ def run(df: pd.DataFrame) -> dict:
     rising_themes: list[str] = []
     if len(work) > 0:
         max_year = int(work["_year"].max())
-        cutoff = max_year - 2  # last 3 years inclusive: cutoff, cutoff+1, cutoff+2, max_year
+        cutoff = max_year - 2  # recent window = years cutoff..max_year inclusive (3 years)
 
         themes = work["theme"].dropna().unique()
         for theme in themes:

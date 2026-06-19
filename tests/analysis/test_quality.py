@@ -93,3 +93,30 @@ def test_quality_no_nan_in_features(quality_df):
         for v in r.values():
             if isinstance(v, float):
                 assert not math.isnan(v), f"NaN in {r}"
+
+
+def test_quality_empty_comparison_group_delta_is_none():
+    """When ALL games have offline_progress (n_without==0), delta must be None, not 0.0.
+
+    Red-before-green: this test catches the bug where delta was set to 0.0
+    instead of None when one comparison group is empty.
+    """
+    df = pd.DataFrame({
+        "mechanics": [
+            ["offline_progress"],
+            ["offline_progress", "prestige"],
+            ["offline_progress"],
+        ],
+        "is_free": pd.array([True, False, True], dtype="boolean"),
+        "review_pct_positive": [75.0, 80.0, 85.0],
+        "owners_est": pd.array([500, 1000, 750], dtype="Int64"),
+        "owners_confidence": ["high", "high", "medium"],
+    })
+    result = run(df)
+    features = {r["feature"]: r for r in result["features"]}
+    op = features["offline_progress"]
+    # All 3 games have offline_progress → n_without==0 → comparison undefined
+    assert op["n_without"] == 0
+    assert op["mean_without"] is None
+    # delta must be None (undefined), NOT 0.0
+    assert op["delta"] is None, f"Expected delta=None, got delta={op['delta']!r}"

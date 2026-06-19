@@ -43,11 +43,8 @@ def _feature_stats(df: pd.DataFrame, mask: pd.Series, name: str) -> dict:
 
     if mean_with is not None and mean_without is not None:
         delta = mean_with - mean_without
-    elif mean_with is not None:
-        delta = 0.0
-    elif mean_without is not None:
-        delta = 0.0
     else:
+        # One or both comparison groups are empty — delta is undefined, not zero.
         delta = None
 
     def _safe(v: Any) -> Any:
@@ -68,26 +65,33 @@ def _feature_stats(df: pd.DataFrame, mask: pd.Series, name: str) -> dict:
     }
 
 
+VOCAB = {
+    "loved": ["addictive", "satisfying", "offline", "progress", "relaxing"],
+    "hated": ["paywall", "ads", "grind", "timer", "energy", "pay to win", "p2w"],
+}
+
+
 def _reddit_sentiment() -> dict:
-    """Return Reddit sentiment counts if local fixture exists, else {}."""
+    """Return Reddit sentiment counts from real cached reddit responses, else {}.
+
+    cached_get(source="reddit", ...) writes JSON cache files to data/raw/reddit/*.cache.
+    Each file is the raw Reddit API JSON response with shape:
+      data["data"]["children"][i]["data"] → post dict.
+    If the directory is absent or empty (e.g. no OAuth yet), returns {}.
+    """
     try:
-        import glob
         import json
         import pathlib
 
-        # Look for cached reddit posts in the data/cache directory.
-        cache_dir = pathlib.Path("data/cache")
-        reddit_files = list(cache_dir.glob("reddit_*.json")) if cache_dir.exists() else []
-        if not reddit_files:
+        cache_dir = pathlib.Path("data/raw/reddit")
+        cache_files = list(cache_dir.glob("*.cache")) if cache_dir.exists() else []
+        if not cache_files:
             return {}
 
         posts: list[dict] = []
-        for f in reddit_files:
+        for f in cache_files:
             data = json.loads(f.read_text(encoding="utf-8"))
-            # Could be a list of posts or an API response wrapper.
-            if isinstance(data, list):
-                posts.extend(data)
-            elif isinstance(data, dict) and "data" in data:
+            if isinstance(data, dict) and "data" in data:
                 children = data["data"].get("children", [])
                 posts.extend(child.get("data", {}) for child in children)
 
@@ -96,11 +100,7 @@ def _reddit_sentiment() -> dict:
 
         from src.scrapers.reddit import extract_sentiment_terms
 
-        vocab = {
-            "loved": ["addictive", "satisfying", "love", "great", "offline", "prestige"],
-            "hated": ["paywall", "ads", "pay to win", "p2w", "boring", "tedious"],
-        }
-        return extract_sentiment_terms(posts, vocab)
+        return extract_sentiment_terms(posts, VOCAB)
 
     except Exception:
         return {}
