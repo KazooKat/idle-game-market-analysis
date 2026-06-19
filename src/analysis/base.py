@@ -53,6 +53,11 @@ def weighted_quality(df: pd.DataFrame, by: str) -> pd.DataFrame:
     # Drop rows where the group key is null.
     df = df[df[by].notna()].copy()
 
+    # Guard: if no rows remain after dropping nulls, return an empty DataFrame
+    # with the correct schema so callers (e.g. to_records) get [] without KeyError.
+    if df.empty:
+        return pd.DataFrame(columns=[by, "count", "mean_positive", "total_owners", "weighted_score"])
+
     # Boolean mask: row qualifies for owner-weight contribution.
     df["_trusted"] = df["owners_confidence"].isin(_TRUSTED_CONF)
 

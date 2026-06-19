@@ -180,6 +180,49 @@ def test_to_records_json_safe():
 
 
 # ---------------------------------------------------------------------------
+# Bug fix: weighted_quality on an all-null grouping column (Bug 1)
+#
+# Red-before-green evidence (preserved as a comment):
+#   BEFORE the fix, calling weighted_quality(df, "theme") on a DataFrame where
+#   every "theme" value is None would produce an empty groupby result that had
+#   NO columns at all.  Accessing result["count"] then raised KeyError: 'count',
+#   which in turn crashed art.py (art_style all-null on the real 3479-game
+#   dataset) with KeyError: 'count' propagated through to_records().
+#
+#   The test below was confirmed to raise KeyError BEFORE the guard was added
+#   to weighted_quality.  After the guard it must pass.
+# ---------------------------------------------------------------------------
+
+@pytest.fixture
+def all_null_theme_df():
+    """DataFrame whose entire 'theme' column is null — simulates art_style=all-null."""
+    return pd.DataFrame({
+        "theme": [None, None, None],
+        "review_pct_positive": [80.0, 60.0, 90.0],
+        "owners_est": pd.array([1000, 500, 2000], dtype="Int64"),
+        "owners_confidence": ["high", "medium", "high"],
+    })
+
+
+def test_weighted_quality_all_null_by_returns_empty_df_with_correct_columns(all_null_theme_df):
+    """weighted_quality on all-null group column returns empty DataFrame with correct schema."""
+    result = weighted_quality(all_null_theme_df, "theme")
+    assert isinstance(result, pd.DataFrame)
+    assert len(result) == 0, "Expected zero rows when all group keys are null"
+    expected_cols = {"theme", "count", "mean_positive", "total_owners", "weighted_score"}
+    assert expected_cols.issubset(set(result.columns)), (
+        f"Missing columns: {expected_cols - set(result.columns)}"
+    )
+
+
+def test_to_records_on_all_null_by_returns_empty_list(all_null_theme_df):
+    """to_records(weighted_quality(...)) on all-null group column yields [] without KeyError."""
+    result = weighted_quality(all_null_theme_df, "theme")
+    records = to_records(result)
+    assert records == [], f"Expected [], got {records}"
+
+
+# ---------------------------------------------------------------------------
 # load_master smoke test (no real parquet required — just checks it raises
 # FileNotFoundError on missing path, not some unexpected error)
 # ---------------------------------------------------------------------------

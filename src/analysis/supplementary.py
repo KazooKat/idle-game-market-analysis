@@ -199,7 +199,7 @@ def main(out_dir: str = "data/analysis") -> None:
         f"[supplementary] itch={itch_count} games, "
         f"kongregate={kong_count} games, "
         f"reddit={'available' if reddit_ok else 'unavailable'} "
-        f"→ {out_file}"
+        f"-> {out_file}"
     )
 
 
