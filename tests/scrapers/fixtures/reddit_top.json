@@ -2,7 +2,7 @@
   "kind": "Listing",
   "data": {
     "after": "t3_abc123",
-    "dist": 3,
+    "dist": 4,
     "children": [
       {
         "kind": "t3",
@@ -44,6 +44,21 @@
           "permalink": "/r/incremental_games/comments/abc333/",
           "id": "abc333",
           "author": "user_gamma"
+        }
+      },
+      {
+        "kind": "t3",
+        "data": {
+          "title": "Great paywall-free idle game — link inside",
+          "selftext": null,
+          "score": 450,
+          "upvote_ratio": 0.91,
+          "num_comments": 23,
+          "created_utc": 1700000004,
+          "permalink": "/r/incremental_games/comments/abc444/",
+          "id": "abc444",
+          "author": "user_delta",
+          "url": "https://example.com/game"
         }
       }
     ]

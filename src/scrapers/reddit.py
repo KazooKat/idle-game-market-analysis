@@ -48,7 +48,7 @@ def extract_sentiment_terms(
     """
     counts: dict[str, int] = {category: 0 for category in vocab}
     for post in posts:
-        text = (post.get("title", "") + " " + post.get("selftext", "")).lower()
+        text = ((post.get("title") or "") + " " + (post.get("selftext") or "")).lower()
         for category, terms in vocab.items():
             if any(term.lower() in text for term in terms):
                 counts[category] += 1

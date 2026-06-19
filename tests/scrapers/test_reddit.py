@@ -4,18 +4,20 @@ fetch_top returns a list of post-data dicts (the .data field of each child node)
 extract_sentiment_terms accepts that same list.
 """
 import json
+import pathlib
 import pytest
 from unittest.mock import patch, MagicMock
 
 from src.scrapers.reddit import extract_sentiment_terms, fetch_top
 
 
-FIXTURE = "tests/scrapers/fixtures/reddit_top.json"
+_FIXTURE_PATH = pathlib.Path(__file__).parent / "fixtures" / "reddit_top.json"
 
 
 def _load_posts() -> list[dict]:
     """Load fixture and return list of post-data dicts (same shape fetch_top produces)."""
-    raw = json.load(open(FIXTURE))
+    with open(_FIXTURE_PATH) as f:
+        raw = json.load(f)
     return [child["data"] for child in raw["data"]["children"]]
 
 
@@ -78,7 +80,8 @@ def test_extract_no_match():
 
 def test_fetch_top_returns_post_dicts():
     """fetch_top should return a list of post-data dicts (not raw children)."""
-    raw = json.load(open(FIXTURE))
+    with open(_FIXTURE_PATH) as f:
+        raw = json.load(f)
     mock_resp = MagicMock()
     mock_resp.status_code = 200
     mock_resp.json.return_value = raw
@@ -87,7 +90,26 @@ def test_fetch_top_returns_post_dicts():
         posts = fetch_top("incremental_games")
 
     assert isinstance(posts, list)
-    assert len(posts) == 3
+    assert len(posts) == 4
     # each element must be a post-data dict (has title key, no 'kind' key)
     assert "title" in posts[0]
     assert "kind" not in posts[0]
+
+
+# ---------------------------------------------------------------------------
+# Null selftext guard (finding 1)
+# ---------------------------------------------------------------------------
+
+def test_extract_handles_null_selftext_via_fixture():
+    """Fixture includes a link post with selftext=null; must not crash."""
+    posts = _load_posts()
+    # The link post title contains 'paywall', so hated count must be >= 2
+    result = extract_sentiment_terms(posts, {"hated": ["paywall"]})
+    assert result["hated"] >= 2
+
+
+def test_extract_handles_null_selftext_direct():
+    """Directly passing selftext=None must not raise TypeError and must count correctly."""
+    posts = [{"title": "has paywall", "selftext": None}]
+    result = extract_sentiment_terms(posts, {"hated": ["paywall"]})
+    assert result == {"hated": 1}
