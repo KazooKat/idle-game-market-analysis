@@ -3,11 +3,15 @@ Task 8b: test that build() survives one bad app without aborting the whole run.
 
 Design:
 - 3 fake appids: "111", "222" (succeed), "333" (raises on steam.fetch_details).
-- steamspy.fetch_tag, steam.fetch_details, steam.fetch_news, steam.update_cadence
-  are all monkeypatched so NO network calls are made.
+- steamspy.fetch_tag, steamspy.fetch_appdetails, steam.fetch_details, steam.fetch_news,
+  steam.update_cadence are all monkeypatched so NO network calls are made.
 - build() runs in a tmp_path dir so parquet is written there, not to real data/.
 - Config dict is constructed inline from the real sources.yaml values so no file I/O
   after chdir.
+
+Also tests (Task: appdetails enrichment):
+- build_art_style_via_appdetails_tags: appdetails records WITH tags flow through
+  parse_app → merge_records → taxonomy → art_style is non-null for a pixel-tagged game.
 """
 
 import pytest
@@ -35,30 +39,53 @@ CFG = {
         "multiplier": ["multiplier", "boost", "synergy"],
     },
     "art_keywords": {
-        "pixel": ["pixel", "8-bit", "retro"],
-        "hand_drawn": ["hand-drawn", "hand drawn", "cartoon"],
-        "anime": ["anime", "manga"],
-        "minimalist": ["minimalist", "minimal", "clean"],
+        "pixel": ["pixel", "pixel graphics", "8-bit", "16-bit", "retro"],
+        "hand_drawn": ["hand-drawn", "hand drawn", "cartoon", "comic-book", "doodle"],
+        "anime": ["anime", "manga", "jrpg"],
+        "minimalist": ["minimalist", "minimal", "clean", "abstract"],
         "three_d": ["3d", "3-d"],
-        "cute": ["cute", "kawaii", "adorable"],
+        "two_d": ["2d", "2-d"],
+        "cute": ["cute", "kawaii", "adorable", "colorful", "cartoony"],
+        "stylized": ["stylized", "low-poly", "voxel", "pixel art"],
     },
 }
 
 BAD_APPID = "333"
 
 # ── fake SteamSpy tag payload — 3 apps ──────────────────────────────────────
+# NOTE: tag-endpoint records have NO tags (that was the bug). Discovery only.
 FAKE_TAG_RESULT = {
     "111": {
         "appid": 111, "name": "Good Idle One", "owners": "20000 .. 50000",
-        "positive": 100, "negative": 10, "ccu": 5, "price": "0", "tags": {"Idler": 50},
+        "positive": 100, "negative": 10, "ccu": 5, "price": "0", "tags": {},
     },
     "222": {
         "appid": 222, "name": "Good Idle Two", "owners": "50000 .. 100000",
-        "positive": 200, "negative": 20, "ccu": 10, "price": "499", "tags": {"Clicker": 30},
+        "positive": 200, "negative": 20, "ccu": 10, "price": "499", "tags": {},
     },
     BAD_APPID: {
         "appid": 333, "name": "Broken App", "owners": "0 .. 0",
         "positive": 0, "negative": 0, "ccu": 0, "price": None, "tags": {},
+    },
+}
+
+# ── fake SteamSpy appdetails payload — includes tags ────────────────────────
+# App 111 has "Pixel Graphics" tag → should produce art_style="pixel"
+FAKE_APPDETAILS = {
+    "111": {
+        "appid": 111, "name": "Good Idle One", "owners": "20000 .. 50000",
+        "positive": 100, "negative": 10, "ccu": 5, "price": "0",
+        "tags": {"Idler": 50, "Pixel Graphics": 30, "Clicker": 10},
+    },
+    "222": {
+        "appid": 222, "name": "Good Idle Two", "owners": "50000 .. 100000",
+        "positive": 200, "negative": 20, "ccu": 10, "price": "499",
+        "tags": {"Clicker": 30, "RPG": 10},
+    },
+    BAD_APPID: {
+        "appid": 333, "name": "Broken App", "owners": "0 .. 0",
+        "positive": 0, "negative": 0, "ccu": 0, "price": None,
+        "tags": {},
     },
 }
 
@@ -103,6 +130,15 @@ def make_fake_fetch_tag():
     return _fetch
 
 
+def make_fake_fetch_appdetails():
+    """fetch_appdetails returns the per-app record WITH tags dict.
+    This is the appdetails enrichment — includes real Steam tags.
+    """
+    def _fetch(appid, refresh=False):
+        return FAKE_APPDETAILS[str(appid)]
+    return _fetch
+
+
 def make_fake_fetch_news():
     """fetch_news in the real scraper returns a list of newsitems directly."""
     def _fetch(appid, count=20, refresh=False):
@@ -110,7 +146,7 @@ def make_fake_fetch_news():
     return _fetch
 
 
-# ── test ─────────────────────────────────────────────────────────────────────
+# ── test: resilience (original) ──────────────────────────────────────────────
 
 def test_build_skips_bad_app_and_returns_good_rows(monkeypatch, tmp_path):
     """
@@ -121,29 +157,72 @@ def test_build_skips_bad_app_and_returns_good_rows(monkeypatch, tmp_path):
     """
     # chdir to tmp_path so parquet writes land in tmp and not real data/
     monkeypatch.chdir(tmp_path)
-    # We also need data/processed/ to exist (build makes it with mkdir parents)
-    # build() calls Path("data/processed").mkdir(parents=True, exist_ok=True) — fine.
 
-    # Patch the module-level steam and steamspy references used in build_master
     import src.pipeline.build_master as bm
     import src.scrapers.steamspy as spy_mod
     import src.scrapers.steam as steam_mod
 
-    # patch steamspy.fetch_tag via the scrapers module AND the reference in build_master
     monkeypatch.setattr(spy_mod, "fetch_tag", make_fake_fetch_tag())
-    # patch steam.fetch_details to raise for BAD_APPID
+    monkeypatch.setattr(spy_mod, "fetch_appdetails", make_fake_fetch_appdetails())
     monkeypatch.setattr(steam_mod, "fetch_details", make_fake_fetch_details())
-    # patch steam.fetch_news to return []
     monkeypatch.setattr(steam_mod, "fetch_news", make_fake_fetch_news())
 
     df = bm.build(CFG, limit=None, refresh=False)
 
-    # 2 good apps should be in result; bad app skipped
     assert isinstance(df, pd.DataFrame), "build() must return a DataFrame"
     assert len(df) == 2, (
         f"Expected 2 rows (good apps only), got {len(df)}. "
         "If this is 3, error handling is missing. If this is 0, something else broke."
     )
-    # Verify the parquet was written
     parquet_path = tmp_path / "data" / "processed" / "games.parquet"
     assert parquet_path.exists(), "games.parquet was not written"
+
+
+# ── test: art_style flows from appdetails tags ───────────────────────────────
+
+def test_build_art_style_via_appdetails_tags(monkeypatch, tmp_path):
+    """
+    Red-before-green: before the appdetails change, parse_app received the tag-endpoint
+    record (no tags dict) → art_style was always None. After the change, parse_app
+    receives the appdetails record WITH tags → pick_art_style returns 'pixel' for
+    app 111 (which has 'Pixel Graphics' in its tags).
+
+    Asserts:
+    - tags column is non-empty for the pixel-tagged game
+    - art_style is non-null ('pixel') for the pixel-tagged game
+    """
+    monkeypatch.chdir(tmp_path)
+
+    import src.pipeline.build_master as bm
+    import src.scrapers.steamspy as spy_mod
+    import src.scrapers.steam as steam_mod
+
+    monkeypatch.setattr(spy_mod, "fetch_tag", make_fake_fetch_tag())
+    monkeypatch.setattr(spy_mod, "fetch_appdetails", make_fake_fetch_appdetails())
+    monkeypatch.setattr(steam_mod, "fetch_details", make_fake_fetch_details())
+    monkeypatch.setattr(steam_mod, "fetch_news", make_fake_fetch_news())
+
+    df = bm.build(CFG, limit=None, refresh=False)
+
+    assert len(df) == 2, f"Expected 2 rows, got {len(df)}"
+
+    # Find the pixel-tagged game (appid 111)
+    pixel_rows = df[df["id"] == "111"]
+    assert len(pixel_rows) == 1, "App 111 should be in results"
+    pixel_row = pixel_rows.iloc[0]
+
+    # Tags must be non-empty (flows from appdetails record)
+    assert pixel_row["tags"] and len(pixel_row["tags"]) > 0, (
+        f"Expected non-empty tags for app 111, got {pixel_row['tags']!r}. "
+        "Tags must flow from fetch_appdetails into parse_app."
+    )
+    assert "Pixel Graphics" in pixel_row["tags"], (
+        f"'Pixel Graphics' tag missing from app 111 tags: {pixel_row['tags']!r}"
+    )
+
+    # art_style must be 'pixel' (from 'Pixel Graphics' tag via art_keywords)
+    assert pixel_row["art_style"] == "pixel", (
+        f"Expected art_style='pixel' for app 111 (has 'Pixel Graphics' tag), "
+        f"got {pixel_row['art_style']!r}. "
+        "Check fetch_appdetails is patched and art_keywords includes 'pixel graphics'."
+    )

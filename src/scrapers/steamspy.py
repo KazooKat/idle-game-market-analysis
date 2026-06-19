@@ -2,6 +2,12 @@ from src.common.http import cached_get
 
 BASE = "https://steamspy.com/api.php"
 
+def fetch_appdetails(appid, refresh=False) -> dict:
+    r = cached_get(BASE, source="steamspy_appdetails",
+                   params={"request": "appdetails", "appid": appid},
+                   rate_key="steamspy", refresh=refresh)
+    return r.json()
+
 def fetch_tag(tag: str, refresh=False) -> dict:
     r = cached_get(BASE, source="steamspy", params={"request": "tag", "tag": tag},
                    rate_key="steamspy", refresh=refresh)

@@ -1,4 +1,5 @@
-from src.pipeline.taxonomy import classify, business_model
+import yaml
+from src.pipeline.taxonomy import classify, business_model, pick_art_style
 
 CFG = {"space": ["space", "galaxy"], "mining": ["mine", "mining", "ore"]}
 
@@ -70,4 +71,27 @@ def test_word_boundary_case_insensitive():
     result = classify("Explore the GALAXY beyond", [], CFG_SPACE)
     assert result == ["space"], (
         f"Expected ['space'], got {result!r}."
+    )
+
+
+# ---------------------------------------------------------------------------
+# pick_art_style with real sources.yaml art_keywords (Steam tag names)
+# ---------------------------------------------------------------------------
+
+def test_pick_art_style_pixel_graphics_tag():
+    """'Pixel Graphics' Steam tag → art_style = 'pixel' via sources.yaml keywords."""
+    cfg = yaml.safe_load(open("config/sources.yaml", encoding="utf-8"))
+    result = pick_art_style(["Pixel Graphics"], cfg)
+    assert result == "pixel", (
+        f"Expected 'pixel' from tag 'Pixel Graphics', got {result!r}. "
+        "Check art_keywords.pixel includes 'pixel graphics'."
+    )
+
+
+def test_pick_art_style_none_when_no_art_tags():
+    """No art tags → art_style is None."""
+    cfg = yaml.safe_load(open("config/sources.yaml", encoding="utf-8"))
+    result = pick_art_style(["Idler", "Clicker", "RPG"], cfg)
+    assert result is None, (
+        f"Expected None for non-art tags, got {result!r}."
     )

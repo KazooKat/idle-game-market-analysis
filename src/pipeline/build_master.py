@@ -1,4 +1,4 @@
-from pathlib import Path
+﻿from pathlib import Path
 import pandas as pd
 from src.scrapers import steamspy, steam
 from src.pipeline.normalize import merge_records
@@ -15,7 +15,7 @@ def build(cfg, limit=None, refresh=False) -> pd.DataFrame:
     skipped_apps = []
     for i, appid in enumerate(appids, 1):
         try:
-            ss = steamspy.parse_app(seen[appid])
+            ss = steamspy.parse_app(steamspy.fetch_appdetails(appid, refresh=refresh))
             det = steam.parse_details(steam.fetch_details(appid, refresh=refresh), appid)
             news = steam.fetch_news(appid, refresh=refresh)
             row = merge_records(ss, det, cfg)
@@ -36,3 +36,4 @@ def build(cfg, limit=None, refresh=False) -> pd.DataFrame:
     Path("data/processed").mkdir(parents=True, exist_ok=True)
     df.to_parquet("data/processed/games.parquet")
     return df
+
