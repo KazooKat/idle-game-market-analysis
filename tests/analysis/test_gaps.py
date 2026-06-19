@@ -68,8 +68,8 @@ def test_gaps_record_has_required_keys(gaps_df):
         assert "underserved" in r
 
 
-def test_gaps_nan_demand_themes_dropped():
-    """Themes with NaN weighted_score should not appear in the output."""
+def test_gaps_nan_demand_theme_included_with_none():
+    """Themes with NaN weighted_score MUST still appear in output with demand=None."""
     df = pd.DataFrame({
         "theme": ["good", "nodata"],
         "review_pct_positive": [80.0, None],
@@ -78,7 +78,31 @@ def test_gaps_nan_demand_themes_dropped():
     })
     result = run(df)
     theme_names = [r["theme"] for r in result["themes"]]
-    assert "nodata" not in theme_names
+    assert "nodata" in theme_names, "no-data theme must appear in output"
+    by_theme = {r["theme"]: r for r in result["themes"]}
+    assert by_theme["nodata"]["demand"] is None
+    assert by_theme["nodata"]["underserved"] is False
+
+
+def test_gaps_insufficient_data_key():
+    """Result must have 'insufficient_data' key listing themes with demand=None."""
+    df = pd.DataFrame({
+        "theme": ["good", "nodata"],
+        "review_pct_positive": [80.0, None],
+        "owners_est": pd.array([1000, 500], dtype="Int64"),
+        "owners_confidence": ["high", "low"],
+    })
+    result = run(df)
+    assert "insufficient_data" in result
+    assert "nodata" in result["insufficient_data"]
+    assert "good" not in result["insufficient_data"]
+
+
+def test_gaps_all_themes_present(gaps_df):
+    """All themes in the input must appear in the output."""
+    result = run(gaps_df)
+    theme_names = {r["theme"] for r in result["themes"]}
+    assert {"niche_hot", "saturated", "mid1", "mid2"}.issubset(theme_names)
 
 
 def test_gaps_underserved_is_bool(gaps_df):
