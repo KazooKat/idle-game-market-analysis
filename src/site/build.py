@@ -218,12 +218,22 @@ def _fig_gap_scatter(analysis: dict) -> str | None:
             bgcolor="rgba(255,255,255,0.7)",
         )
 
-    fig.update_xaxes(type="log")
+    # Bound both axes explicitly. add_vline on a log axis otherwise lets the
+    # autorange blow out (observed: x extended to 1e72, cramming every theme at
+    # the far left). Log-axis range is given in log10 units.
+    import math
+
+    x_lo = math.log10(max(1, min(x_supply)) * 0.7)
+    x_hi = math.log10(max(x_supply) * 1.5)
+    y_lo = min(y_demand) - 2
+    y_hi = max(y_demand) + 3  # headroom for the "Underserved" label
+    fig.update_xaxes(type="log", range=[x_lo, x_hi])
+    fig.update_yaxes(range=[y_lo, y_hi])
     fig.update_layout(
         title="Supply vs Demand by Theme (log supply axis; red = underserved: low supply, high demand)",
         xaxis_title="Supply — number of games (log scale)",
         yaxis_title="Demand — weighted quality score",
-        height=520,
+        height=560,
     )
     return _fig_to_div(fig)
 
