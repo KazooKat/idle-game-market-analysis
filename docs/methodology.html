@@ -53,11 +53,12 @@
       </thead>
       <tbody>
         <tr>
-          <td>Steam store pages</td>
-          <td>Primary spine — game metadata, review scores, short descriptions</td>
-          <td>High (review % from thousands of reviews)</td>
-          <td>Per-game tags were not available via the SteamSpy API endpoint used;
-              themes and mechanics are derived from short descriptions instead (see below).</td>
+          <td>Steam store pages + SteamSpy appdetails</td>
+          <td>Primary spine — game metadata, review scores, short descriptions, and real Steam user tags</td>
+          <td>High (review % from thousands of reviews); user tags crowd-sourced (medium confidence)</td>
+          <td>Per-game Steam user tags are fetched via the SteamSpy appdetails endpoint and used
+              for art style, theme, and mechanic classification, supplemented by short description
+              keyword matching. Tags are community-applied and can be noisy or popularity-biased.</td>
         </tr>
         <tr>
           <td>SteamSpy</td>
@@ -96,12 +97,11 @@
     <h3>Why Steam is the Spine</h3>
     <p>
       Steam is the dominant PC distribution platform for idle games and provides:
-      structured game metadata, short descriptions (used for theme/mechanic
-      keyword classification), review counts and percentages, and price/business
-      model data. Per-game Steam tags were not available from the SteamSpy
-      endpoint used — see the Theme / Mechanic Classification section below.
-      SteamSpy provides modeled owner counts which, despite their uncertainty,
-      are the only freely available proxy for reach on the platform.
+      structured game metadata, short descriptions, real Steam user tags (fetched
+      via the SteamSpy appdetails endpoint), review counts and percentages, and
+      price/business model data. SteamSpy also provides modeled owner counts which,
+      despite their uncertainty, are the only freely available proxy for reach on
+      the platform.
     </p>
     <h3>Weighted Score Formula</h3>
     <p>
@@ -112,22 +112,26 @@
     </p>
     <h3>Theme / Mechanic Classification</h3>
     <p>
-      <strong>Important:</strong> Per-game Steam tags were <em>not</em> available
-      from the SteamSpy API endpoint used in this pipeline — the tag response
-      returned no per-game data for any of the 3,479 games. Themes and mechanics
-      are therefore derived entirely from each game's <strong>short description</strong>
-      text via keyword word-boundary matching (a medium/low-confidence heuristic).
-      This approach can mis-classify games whose descriptions contain thematic words
-      incidentally (e.g. a description mentioning "space" in a different context).
-      A game may be assigned to multiple themes or mechanics. Results should be
-      treated as directional signals, not authoritative genre classifications.
+      Themes, mechanics, and art style are classified from each game's real
+      <strong>Steam user tags</strong> (fetched via the SteamSpy appdetails endpoint)
+      <em>plus</em> its <strong>short description</strong>, using word-boundary keyword
+      matching. Steam user tags are crowd-sourced — community-applied, and can be noisy,
+      inconsistent, or popularity-biased — so this is a <strong>medium-confidence</strong>
+      heuristic: better than description-only classification, but not authoritative
+      genre data. A game may be assigned to multiple themes or mechanics. Results should
+      be treated as directional signals, not definitive genre classifications.
+    </p>
+    <p>
+      The "rpg" theme is the most commonly detected in this corpus because "RPG" is
+      a very common community-applied Steam tag on idle games. This reflects genuine
+      community tagging behaviour on Steam, not a classification artefact.
     </p>
     <h3>Art Style</h3>
     <p>
-      Art style classification depended on per-game Steam tags, which were not
-      available (see above). As a result, <strong>art_style is null for all games</strong>
-      in this dataset — the Art Style section of the report shows no data.
-      This is a known limitation of the current pipeline, not a rendering error.
+      Art style is classified from each game's real Steam user tags (e.g. "Pixel Graphics",
+      "Anime", "Hand-drawn"). Of 3,479 games, <strong>3,206 have an art style assigned</strong>
+      (pixel: 799, hand_drawn: 613, two_d: 516, three_d: 477, minimalist: 438, anime: 235,
+      cute: 114, stylized: 14). Tags are crowd-sourced (see caveat above) — medium confidence.
     </p>
     <h3>Underserved Flag (Gaps Module)</h3>
     <p>
@@ -182,9 +186,9 @@
       
       <li>SteamDB was excluded from this pipeline (Cloudflare / ToS barriers). The Steam News API IS used for update cadence detection (~2,169 games).</li>
       
-      <li>Theme and mechanic classifications are derived from short description keyword matching (word-boundary regex), NOT from Steam tags — per-game tags were unavailable from the SteamSpy endpoint. Medium-low confidence; treat as directional signals only.</li>
+      <li>Theme, mechanic, and art style classifications are derived from each game's real Steam user tags (fetched via the SteamSpy appdetails endpoint) plus short description keyword matching (word-boundary regex). Tags are crowd-sourced (community-applied, can be noisy or popularity-biased) — medium confidence; treat as directional signals, not authoritative genre data.</li>
       
-      <li>Art style has no data source in this pipeline (depended on per-game Steam tags, which were unavailable). Art style is null for all games.</li>
+      <li>Art style is classified from Steam user tags (e.g. 'Pixel Graphics', 'Anime'). 3,206 of 3,479 games have an art style assigned. Tags are crowd-sourced (medium confidence — see above).</li>
       
       <li>Weighted score = review_pct_positive × log(1 + total_owners); biases toward popular games with high approval.</li>
       
@@ -226,11 +230,12 @@
           <td>Inherits SteamSpy uncertainty. Useful for ranking, not absolute values.</td>
         </tr>
         <tr>
-          <td>Theme / mechanic classification</td>
-          <td>Medium–Low</td>
-          <td>Derived from short description keyword matching (word-boundary regex);
-              per-game Steam tags were unavailable. Can over- or under-classify.
-              Art style has no data source and is null for all games.</td>
+          <td>Theme / mechanic / art style classification</td>
+          <td>Medium</td>
+          <td>Classified from real Steam user tags (SteamSpy appdetails) plus short description
+              keyword matching (word-boundary regex). Tags are crowd-sourced — community-applied,
+              can be noisy or popularity-biased. Better than description-only, but not authoritative.
+              Art style assigned for 3,206 / 3,479 games.</td>
         </tr>
         <tr>
           <td>Underserved flag</td>

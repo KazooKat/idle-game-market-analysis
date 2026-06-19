@@ -2,52 +2,52 @@
   "themes": [
     {
       "theme": "rpg",
-      "count": 400,
-      "mean_positive": 72.0972010178117,
-      "total_owners": 40035000,
-      "weighted_score": 81.31099712248218
+      "count": 1403,
+      "mean_positive": 73.13309352517986,
+      "total_owners": 131615000,
+      "weighted_score": 80.99895154218613
     },
     {
       "theme": "space",
-      "count": 138,
-      "mean_positive": 74.52919708029196,
-      "total_owners": 3935000,
-      "weighted_score": 74.40675159235668
+      "count": 225,
+      "mean_positive": 73.06367713004484,
+      "total_owners": 7975000,
+      "weighted_score": 79.05378310214375
     },
     {
       "theme": "money",
-      "count": 130,
-      "mean_positive": 68.55511811023622,
-      "total_owners": 13940000,
-      "weighted_score": 75.58001437814522
-    },
-    {
-      "theme": "nature",
-      "count": 97,
-      "mean_positive": 80.6178947368421,
-      "total_owners": 3040000,
-      "weighted_score": 83.45215231788079
-    },
-    {
-      "theme": "fantasy",
-      "count": 90,
-      "mean_positive": 78.60222222222222,
-      "total_owners": 4500000,
-      "weighted_score": 81.62055555555555
-    },
-    {
-      "theme": "factory",
-      "count": 58,
-      "mean_positive": 74.9551724137931,
-      "total_owners": 4780000,
-      "weighted_score": 81.31799163179916
+      "count": 95,
+      "mean_positive": 67.80869565217391,
+      "total_owners": 4370000,
+      "weighted_score": 70.63364055299539
     },
     {
       "theme": "mining",
-      "count": 50,
-      "mean_positive": 69.954,
-      "total_owners": 2335000,
-      "weighted_score": 77.81948608137046
+      "count": 72,
+      "mean_positive": 70.7486111111111,
+      "total_owners": 5005000,
+      "weighted_score": 82.57502497502497
+    },
+    {
+      "theme": "fantasy",
+      "count": 68,
+      "mean_positive": 77.59117647058824,
+      "total_owners": 1935000,
+      "weighted_score": 75.6095607235142
+    },
+    {
+      "theme": "factory",
+      "count": 63,
+      "mean_positive": 77.88888888888889,
+      "total_owners": 4650000,
+      "weighted_score": 82.05397849462365
+    },
+    {
+      "theme": "nature",
+      "count": 60,
+      "mean_positive": 81.63965517241378,
+      "total_owners": 1705000,
+      "weighted_score": 84.99554896142433
     },
     {
       "theme": "cookie",
@@ -60,8 +60,8 @@
   "mechanics": [
     {
       "mechanic": "automation",
-      "count": 68,
-      "mean_positive": 75.12272727272727
+      "count": 413,
+      "mean_positive": 70.85707317073171
     },
     {
       "mechanic": "prestige",

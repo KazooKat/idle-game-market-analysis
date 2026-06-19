@@ -2,45 +2,45 @@
   "themes": [
     {
       "theme": "rpg",
-      "supply": 400,
-      "demand": 81.31099712248218,
+      "supply": 1403,
+      "demand": 80.99895154218613,
       "underserved": false
     },
     {
       "theme": "space",
-      "supply": 138,
-      "demand": 74.40675159235668,
+      "supply": 225,
+      "demand": 79.05378310214375,
       "underserved": false
     },
     {
       "theme": "money",
-      "supply": 130,
-      "demand": 75.58001437814522,
-      "underserved": false
-    },
-    {
-      "theme": "nature",
-      "supply": 97,
-      "demand": 83.45215231788079,
-      "underserved": false
-    },
-    {
-      "theme": "fantasy",
-      "supply": 90,
-      "demand": 81.62055555555555,
-      "underserved": false
-    },
-    {
-      "theme": "factory",
-      "supply": 58,
-      "demand": 81.31799163179916,
+      "supply": 95,
+      "demand": 70.63364055299539,
       "underserved": false
     },
     {
       "theme": "mining",
-      "supply": 50,
-      "demand": 77.81948608137046,
+      "supply": 72,
+      "demand": 82.57502497502497,
       "underserved": false
+    },
+    {
+      "theme": "fantasy",
+      "supply": 68,
+      "demand": 75.6095607235142,
+      "underserved": false
+    },
+    {
+      "theme": "factory",
+      "supply": 63,
+      "demand": 82.05397849462365,
+      "underserved": false
+    },
+    {
+      "theme": "nature",
+      "supply": 60,
+      "demand": 84.99554896142433,
+      "underserved": true
     },
     {
       "theme": "cookie",
