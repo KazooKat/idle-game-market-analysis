@@ -1,0 +1,38 @@
+{
+  "appnews": {
+    "appid": 123,
+    "newsitems": [
+      {
+        "gid": "1001",
+        "title": "Version 1.0 Launch",
+        "url": "https://store.steampowered.com/news/app/123/view/1001",
+        "author": "developer",
+        "contents": "Game launched today!",
+        "feedlabel": "Steam",
+        "date": 1700000000,
+        "feedname": "steam_community_announcements"
+      },
+      {
+        "gid": "1002",
+        "title": "Update 1.1 - New Features",
+        "url": "https://store.steampowered.com/news/app/123/view/1002",
+        "author": "developer",
+        "contents": "Added new idle mechanics and prestige system.",
+        "feedlabel": "Steam",
+        "date": 1701209600,
+        "feedname": "steam_community_announcements"
+      },
+      {
+        "gid": "1003",
+        "title": "Update 1.2 - Balance Patch",
+        "url": "https://store.steampowered.com/news/app/123/view/1003",
+        "author": "developer",
+        "contents": "Rebalanced progression curve and fixed bugs.",
+        "feedlabel": "Steam",
+        "date": 1702419200,
+        "feedname": "steam_community_announcements"
+      }
+    ],
+    "count": 3
+  }
+}
