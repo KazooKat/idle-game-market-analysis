@@ -1,0 +1,22 @@
+{
+  "by_cadence": [
+    {
+      "cadence": "active",
+      "count": 905,
+      "mean_positive": 75.95778275475924,
+      "total_owners": 50350000
+    },
+    {
+      "cadence": "occasional",
+      "count": 852,
+      "mean_positive": 79.33898104265404,
+      "total_owners": 64475000
+    },
+    {
+      "cadence": "abandoned",
+      "count": 1722,
+      "mean_positive": 72.61788427819988,
+      "total_owners": 91990000
+    }
+  ]
+}

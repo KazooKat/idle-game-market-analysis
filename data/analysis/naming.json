@@ -1,0 +1,19 @@
+{
+  "by_pattern": [
+    {
+      "pattern": "idle_x",
+      "count": 199,
+      "mean_positive": 61.2929292929293
+    },
+    {
+      "pattern": "x_clicker",
+      "count": 108,
+      "mean_positive": 63.90380952380952
+    },
+    {
+      "pattern": "creative",
+      "count": 3172,
+      "mean_positive": 76.37383147853737
+    }
+  ]
+}

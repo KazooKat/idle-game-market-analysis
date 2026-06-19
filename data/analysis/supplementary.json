@@ -1,0 +1,59 @@
+{
+  "itch": {
+    "count": 36,
+    "free_count": 32,
+    "free_pct": 88.9,
+    "top_tags": [
+      [
+        "Simulation",
+        14
+      ],
+      [
+        "Strategy",
+        8
+      ],
+      [
+        "Adventure",
+        3
+      ],
+      [
+        "Puzzle",
+        2
+      ],
+      [
+        "Action",
+        2
+      ],
+      [
+        "Role Playing",
+        1
+      ],
+      [
+        "Survival",
+        1
+      ]
+    ]
+  },
+  "kongregate": {
+    "count": 50,
+    "rated_count": 50,
+    "mean_rating_pct": 79.5,
+    "top_tags": [
+      [
+        "Idle",
+        50
+      ]
+    ]
+  },
+  "reddit": {
+    "available": false,
+    "sentiment": {},
+    "note": "Live Reddit data unavailable (r/incremental_games top.json returns 403 without OAuth); qualitative sentiment not collected."
+  },
+  "caveats": [
+    "itch.io provides no owner/revenue data — coverage counts only.",
+    "Kongregate ratings are 1-5 stars mapped to %positive (low confidence); not comparable to Steam review %.",
+    "Mobile stores not covered (no free data source).",
+    "itch.io and Kongregate data are scraped from static HTML / JSON-LD; counts reflect one page of results, not full catalogue."
+  ]
+}

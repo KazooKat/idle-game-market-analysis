@@ -1,0 +1,29 @@
+{
+  "features": [
+    {
+      "feature": "offline_progress",
+      "mean_with": null,
+      "mean_without": 75.12807424593967,
+      "delta": null,
+      "n_with": 0,
+      "n_without": 3479
+    },
+    {
+      "feature": "prestige",
+      "mean_with": null,
+      "mean_without": 75.12807424593967,
+      "delta": null,
+      "n_with": 0,
+      "n_without": 3479
+    },
+    {
+      "feature": "is_free",
+      "mean_with": 72.3790780141844,
+      "mean_without": 75.37293114339862,
+      "delta": -2.993853129214216,
+      "n_with": 284,
+      "n_without": 3195
+    }
+  ],
+  "reddit_sentiment": {}
+}

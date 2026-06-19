@@ -1,0 +1,76 @@
+{
+  "by_business_model": [
+    {
+      "business_model": "premium",
+      "count": 3150,
+      "mean_positive": 75.5055751361743,
+      "total_owners": 139490000,
+      "weighted_score": 81.10539129182122
+    },
+    {
+      "business_model": "free-premium",
+      "count": 177,
+      "mean_positive": 73.704,
+      "total_owners": 20175000,
+      "weighted_score": 83.80297692880178
+    },
+    {
+      "business_model": "f2p+iap",
+      "count": 107,
+      "mean_positive": 70.21214953271028,
+      "total_owners": 43035000,
+      "weighted_score": 82.03095155106308
+    },
+    {
+      "business_model": "paid+iap",
+      "count": 45,
+      "mean_positive": 66.17333333333333,
+      "total_owners": 4115000,
+      "weighted_score": 68.67241798298906
+    }
+  ],
+  "price_buckets": [
+    {
+      "bucket": "free",
+      "count": 381,
+      "mean_positive": 71.07203166226914,
+      "total_owners": 104050000
+    },
+    {
+      "bucket": "0.01-1",
+      "count": 653,
+      "mean_positive": 76.14093023255815,
+      "total_owners": 18925000
+    },
+    {
+      "bucket": "1-3",
+      "count": 918,
+      "mean_positive": 77.12046204620462,
+      "total_owners": 19495000
+    },
+    {
+      "bucket": "3-5",
+      "count": 674,
+      "mean_positive": 76.41961077844311,
+      "total_owners": 20455000
+    },
+    {
+      "bucket": "5-10",
+      "count": 617,
+      "mean_positive": 72.71615008156607,
+      "total_owners": 22700000
+    },
+    {
+      "bucket": "10-20",
+      "count": 186,
+      "mean_positive": 77.46358695652174,
+      "total_owners": 19305000
+    },
+    {
+      "bucket": "20+",
+      "count": 50,
+      "mean_positive": 60.306,
+      "total_owners": 1885000
+    }
+  ]
+}

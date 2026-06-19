@@ -1,0 +1,82 @@
+{
+  "themes": [
+    {
+      "theme": "mining",
+      "count": 675,
+      "mean_positive": 75.37946026986506,
+      "total_owners": 32490000,
+      "weighted_score": 78.84153039185436
+    },
+    {
+      "theme": "rpg",
+      "count": 384,
+      "mean_positive": 71.0811671087533,
+      "total_owners": 41015000,
+      "weighted_score": 81.74773476614972
+    },
+    {
+      "theme": "space",
+      "count": 170,
+      "mean_positive": 74.78869047619048,
+      "total_owners": 5065000,
+      "weighted_score": 76.97131474103585
+    },
+    {
+      "theme": "nature",
+      "count": 98,
+      "mean_positive": 80.20526315789475,
+      "total_owners": 5090000,
+      "weighted_score": 88.39624505928853
+    },
+    {
+      "theme": "money",
+      "count": 91,
+      "mean_positive": 70.49,
+      "total_owners": 11045000,
+      "weighted_score": 80.5174444947893
+    },
+    {
+      "theme": "fantasy",
+      "count": 82,
+      "mean_positive": 75.7890243902439,
+      "total_owners": 3895000,
+      "weighted_score": 82.29191270860078
+    },
+    {
+      "theme": "factory",
+      "count": 45,
+      "mean_positive": 71.61111111111111,
+      "total_owners": 2530000,
+      "weighted_score": 72.57727272727273
+    },
+    {
+      "theme": "cookie",
+      "count": 4,
+      "mean_positive": 82.55,
+      "total_owners": 3530000,
+      "weighted_score": 96.53966005665723
+    }
+  ],
+  "mechanics": [
+    {
+      "mechanic": "automation",
+      "count": 113,
+      "mean_positive": 72.84684684684684
+    },
+    {
+      "mechanic": "prestige",
+      "count": 50,
+      "mean_positive": 58.952
+    },
+    {
+      "mechanic": "multiplier",
+      "count": 35,
+      "mean_positive": 65.7
+    },
+    {
+      "mechanic": "offline_progress",
+      "count": 21,
+      "mean_positive": 77.0
+    }
+  ]
+}

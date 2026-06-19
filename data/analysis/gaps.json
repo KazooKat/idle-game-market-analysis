@@ -1,0 +1,52 @@
+{
+  "themes": [
+    {
+      "theme": "mining",
+      "supply": 675,
+      "demand": 78.84153039185436,
+      "underserved": false
+    },
+    {
+      "theme": "rpg",
+      "supply": 384,
+      "demand": 81.74773476614972,
+      "underserved": false
+    },
+    {
+      "theme": "space",
+      "supply": 170,
+      "demand": 76.97131474103585,
+      "underserved": false
+    },
+    {
+      "theme": "nature",
+      "supply": 98,
+      "demand": 88.39624505928853,
+      "underserved": false
+    },
+    {
+      "theme": "money",
+      "supply": 91,
+      "demand": 80.5174444947893,
+      "underserved": false
+    },
+    {
+      "theme": "fantasy",
+      "supply": 82,
+      "demand": 82.29191270860078,
+      "underserved": false
+    },
+    {
+      "theme": "factory",
+      "supply": 45,
+      "demand": 72.57727272727273,
+      "underserved": false
+    },
+    {
+      "theme": "cookie",
+      "supply": 4,
+      "demand": 96.53966005665723,
+      "underserved": true
+    }
+  ]
+}
