@@ -1,0 +1,60 @@
+{
+  "by_art_style": [
+    {
+      "art_style": "pixel",
+      "count": 799,
+      "mean_positive": 75.75044025157233,
+      "total_owners": 42890000,
+      "weighted_score": 84.0041073512252
+    },
+    {
+      "art_style": "hand_drawn",
+      "count": 613,
+      "mean_positive": 80.40299500831946,
+      "total_owners": 16675000,
+      "weighted_score": 83.24935064935065
+    },
+    {
+      "art_style": "two_d",
+      "count": 516,
+      "mean_positive": 71.9305447470817,
+      "total_owners": 33700000,
+      "weighted_score": 81.74930225653206
+    },
+    {
+      "art_style": "three_d",
+      "count": 477,
+      "mean_positive": 72.81872340425531,
+      "total_owners": 12535000,
+      "weighted_score": 77.6769694533762
+    },
+    {
+      "art_style": "minimalist",
+      "count": 438,
+      "mean_positive": 76.76826484018265,
+      "total_owners": 11950000,
+      "weighted_score": 82.3131380753138
+    },
+    {
+      "art_style": "anime",
+      "count": 235,
+      "mean_positive": 74.96233766233767,
+      "total_owners": 15175000,
+      "weighted_score": 80.35924298749578
+    },
+    {
+      "art_style": "cute",
+      "count": 114,
+      "mean_positive": 79.36842105263158,
+      "total_owners": 4455000,
+      "weighted_score": 86.37452300785634
+    },
+    {
+      "art_style": "stylized",
+      "count": 14,
+      "mean_positive": 71.42142857142856,
+      "total_owners": 1530000,
+      "weighted_score": 82.72320261437909
+    }
+  ]
+}

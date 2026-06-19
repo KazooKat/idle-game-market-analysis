@@ -1,0 +1,53 @@
+{
+  "123": {
+    "success": true,
+    "data": {
+      "steam_appid": 123,
+      "name": "Idle Test Game",
+      "release_date": {
+        "coming_soon": false,
+        "date": "15 Jan, 2023"
+      },
+      "short_description": "An idle clicker game with deep progression systems.",
+      "is_free": false,
+      "price_overview": {
+        "currency": "USD",
+        "initial": 499,
+        "final": 499,
+        "discount_percent": 0
+      },
+      "screenshots": [
+        {
+          "id": 0,
+          "path_thumbnail": "https://cdn.akamai.steamstatic.com/steam/apps/123/ss_thumb1.jpg",
+          "path_full": "https://cdn.akamai.steamstatic.com/steam/apps/123/ss_full1.jpg"
+        },
+        {
+          "id": 1,
+          "path_thumbnail": "https://cdn.akamai.steamstatic.com/steam/apps/123/ss_thumb2.jpg",
+          "path_full": "https://cdn.akamai.steamstatic.com/steam/apps/123/ss_full2.jpg"
+        }
+      ],
+      "categories": [
+        {
+          "id": 2,
+          "description": "Single-player"
+        },
+        {
+          "id": 35,
+          "description": "In-App Purchases"
+        }
+      ],
+      "genres": [
+        {
+          "id": "4",
+          "description": "Casual"
+        },
+        {
+          "id": "23",
+          "description": "Indie"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,26 @@
+steam_tags: ["Idler", "Clicker", "Incremental"]
+seed_appids: []   # populated by steamspy tag pull; manual seeds optional
+theme_keywords:
+  cookie: [cookie, bakery]
+  space: [space, galaxy, planet, cosmic]
+  mining: [mine, mining, dig, ore]
+  rpg: [rpg, hero, dungeon, quest, adventure]
+  factory: [factory, assembly, production, automate]
+  money: [capitalist, tycoon, money, business, idle profit]
+  fantasy: [magic, wizard, kingdom, realm]
+  nature: [farm, garden, tree, forest]
+mechanic_keywords:
+  offline_progress: [offline, "while away", afk]
+  prestige: [prestige, ascend, ascension, rebirth, reset]
+  automation: [automate, automation, auto, manager]
+  multiplier: [multiplier, boost, synergy]
+art_keywords:
+  pixel: [pixel, "pixel graphics", "8-bit", "16-bit", retro]
+  hand_drawn: [hand-drawn, "hand drawn", cartoon, comic-book, doodle]
+  anime: [anime, manga, jrpg]
+  minimalist: [minimalist, minimal, clean, abstract]
+  three_d: ["3d", "3-d"]
+  two_d: ["2d", "2-d"]
+  cute: [cute, kawaii, adorable, colorful, cartoony]
+  stylized: [stylized, "low-poly", voxel, "pixel art"]
+subreddits: ["incremental_games"]
