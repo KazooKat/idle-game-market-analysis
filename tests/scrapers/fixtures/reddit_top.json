@@ -1,0 +1,51 @@
+{
+  "kind": "Listing",
+  "data": {
+    "after": "t3_abc123",
+    "dist": 3,
+    "children": [
+      {
+        "kind": "t3",
+        "data": {
+          "title": "This idle game hit me with a paywall right before the endgame — so disappointed",
+          "selftext": "I was really enjoying the progression but then they lock the final tier behind a $9.99 purchase. Classic paywall move.",
+          "score": 1540,
+          "upvote_ratio": 0.97,
+          "num_comments": 87,
+          "created_utc": 1700000001,
+          "permalink": "/r/incremental_games/comments/abc111/",
+          "id": "abc111",
+          "author": "user_alpha"
+        }
+      },
+      {
+        "kind": "t3",
+        "data": {
+          "title": "Most satisfying offline progress system I've ever seen",
+          "selftext": "Came back after a week and the game had been running in the background the whole time. Addictive loop, love it.",
+          "score": 2300,
+          "upvote_ratio": 0.99,
+          "num_comments": 134,
+          "created_utc": 1700000002,
+          "permalink": "/r/incremental_games/comments/abc222/",
+          "id": "abc222",
+          "author": "user_beta"
+        }
+      },
+      {
+        "kind": "t3",
+        "data": {
+          "title": "Why do mobile idle games love spamming ads every 30 seconds?",
+          "selftext": "The grind is real but the ad interruptions kill the flow. Timer-gated content too. Not my cup of tea.",
+          "score": 980,
+          "upvote_ratio": 0.94,
+          "num_comments": 62,
+          "created_utc": 1700000003,
+          "permalink": "/r/incremental_games/comments/abc333/",
+          "id": "abc333",
+          "author": "user_gamma"
+        }
+      }
+    ]
+  }
+}
