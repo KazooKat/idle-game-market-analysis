@@ -97,11 +97,20 @@
     }
   ],
   "rising_themes": [
-    "rpg",
+    "fantasy",
+    "economy",
+    "horror",
     "space",
+    "farming",
+    "rpg",
+    "scifi",
+    "medieval",
+    "postapoc",
     "factory",
-    "money",
+    "city",
     "nature",
-    "fantasy"
+    "military",
+    "food",
+    "ocean"
   ]
 }

@@ -1,46 +1,130 @@
 {
   "themes": [
     {
+      "theme": "fantasy",
+      "supply": 575,
+      "demand": 81.8528735632184,
+      "underserved": false
+    },
+    {
+      "theme": "horror",
+      "supply": 286,
+      "demand": 84.37850632911392,
+      "underserved": false
+    },
+    {
       "theme": "rpg",
-      "supply": 1403,
-      "demand": 80.99895154218613,
+      "supply": 255,
+      "demand": 76.45344950213371,
       "underserved": false
     },
     {
       "theme": "space",
-      "supply": 225,
-      "demand": 79.05378310214375,
+      "supply": 227,
+      "demand": 79.0774213836478,
       "underserved": false
     },
     {
-      "theme": "money",
-      "supply": 95,
-      "demand": 70.63364055299539,
+      "theme": "scifi",
+      "supply": 215,
+      "demand": 82.7989652623799,
       "underserved": false
     },
     {
-      "theme": "mining",
-      "supply": 72,
-      "demand": 82.57502497502497,
+      "theme": "economy",
+      "supply": 142,
+      "demand": 83.98180147058824,
       "underserved": false
     },
     {
-      "theme": "fantasy",
-      "supply": 68,
-      "demand": 75.6095607235142,
+      "theme": "farming",
+      "supply": 140,
+      "demand": 86.33845577211395,
       "underserved": false
     },
     {
-      "theme": "factory",
-      "supply": 63,
-      "demand": 82.05397849462365,
+      "theme": "postapoc",
+      "supply": 101,
+      "demand": 75.94606060606061,
+      "underserved": false
+    },
+    {
+      "theme": "medieval",
+      "supply": 91,
+      "demand": 74.95586419753086,
+      "underserved": false
+    },
+    {
+      "theme": "monster",
+      "supply": 86,
+      "demand": 83.86289855072464,
       "underserved": false
     },
     {
       "theme": "nature",
-      "supply": 60,
-      "demand": 84.99554896142433,
+      "supply": 86,
+      "demand": 84.4304,
+      "underserved": false
+    },
+    {
+      "theme": "city",
+      "supply": 49,
+      "demand": 78.50141843971632,
+      "underserved": false
+    },
+    {
+      "theme": "crime",
+      "supply": 40,
+      "demand": 75.44276729559749,
+      "underserved": false
+    },
+    {
+      "theme": "food",
+      "supply": 37,
+      "demand": 77.98504672897197,
+      "underserved": false
+    },
+    {
+      "theme": "mining",
+      "supply": 28,
+      "demand": 84.23388090349076,
+      "underserved": false
+    },
+    {
+      "theme": "mythology",
+      "supply": 28,
+      "demand": 82.84902723735408,
+      "underserved": false
+    },
+    {
+      "theme": "factory",
+      "supply": 27,
+      "demand": 76.76387665198237,
+      "underserved": false
+    },
+    {
+      "theme": "military",
+      "supply": 22,
+      "demand": 69.9077519379845,
+      "underserved": false
+    },
+    {
+      "theme": "robot",
+      "supply": 11,
+      "demand": 88.964,
       "underserved": true
+    },
+    {
+      "theme": "ocean",
+      "supply": 11,
+      "demand": 83.50740740740741,
+      "underserved": true
+    },
+    {
+      "theme": "pirate",
+      "supply": 9,
+      "demand": 71.59107142857142,
+      "underserved": false
     },
     {
       "theme": "cookie",
@@ -48,5 +132,6 @@
       "demand": 77.83333333333333,
       "underserved": false
     }
-  ]
+  ],
+  "insufficient_data": []
 }

@@ -1,53 +1,151 @@
 {
   "themes": [
     {
+      "theme": "fantasy",
+      "count": 575,
+      "mean_positive": 74.36070175438597,
+      "total_owners": 43985000,
+      "weighted_score": 81.8528735632184
+    },
+    {
+      "theme": "horror",
+      "count": 286,
+      "mean_positive": 77.90141342756183,
+      "total_owners": 20120000,
+      "weighted_score": 84.37850632911392
+    },
+    {
       "theme": "rpg",
-      "count": 1403,
-      "mean_positive": 73.13309352517986,
-      "total_owners": 131615000,
-      "weighted_score": 80.99895154218613
+      "count": 255,
+      "mean_positive": 73.45433070866142,
+      "total_owners": 14070000,
+      "weighted_score": 76.45344950213371
     },
     {
       "theme": "space",
-      "count": 225,
-      "mean_positive": 73.06367713004484,
-      "total_owners": 7975000,
-      "weighted_score": 79.05378310214375
+      "count": 227,
+      "mean_positive": 73.20044444444444,
+      "total_owners": 7995000,
+      "weighted_score": 79.0774213836478
     },
     {
-      "theme": "money",
-      "count": 95,
-      "mean_positive": 67.80869565217391,
-      "total_owners": 4370000,
-      "weighted_score": 70.63364055299539
+      "theme": "scifi",
+      "count": 215,
+      "mean_positive": 75.8107476635514,
+      "total_owners": 6775000,
+      "weighted_score": 82.7989652623799
     },
     {
-      "theme": "mining",
-      "count": 72,
-      "mean_positive": 70.7486111111111,
-      "total_owners": 5005000,
-      "weighted_score": 82.57502497502497
+      "theme": "economy",
+      "count": 142,
+      "mean_positive": 68.3058394160584,
+      "total_owners": 13650000,
+      "weighted_score": 83.98180147058824
     },
     {
-      "theme": "fantasy",
-      "count": 68,
-      "mean_positive": 77.59117647058824,
-      "total_owners": 1935000,
-      "weighted_score": 75.6095607235142
+      "theme": "farming",
+      "count": 140,
+      "mean_positive": 77.04460431654677,
+      "total_owners": 6680000,
+      "weighted_score": 86.33845577211395
     },
     {
-      "theme": "factory",
-      "count": 63,
-      "mean_positive": 77.88888888888889,
-      "total_owners": 4650000,
-      "weighted_score": 82.05397849462365
+      "theme": "postapoc",
+      "count": 101,
+      "mean_positive": 68.2861386138614,
+      "total_owners": 4950000,
+      "weighted_score": 75.94606060606061
+    },
+    {
+      "theme": "medieval",
+      "count": 91,
+      "mean_positive": 69.76067415730338,
+      "total_owners": 4880000,
+      "weighted_score": 74.95586419753086
+    },
+    {
+      "theme": "monster",
+      "count": 86,
+      "mean_positive": 81.04588235294118,
+      "total_owners": 1735000,
+      "weighted_score": 83.86289855072464
     },
     {
       "theme": "nature",
-      "count": 60,
-      "mean_positive": 81.63965517241378,
-      "total_owners": 1705000,
-      "weighted_score": 84.99554896142433
+      "count": 86,
+      "mean_positive": 82.24457831325302,
+      "total_owners": 1280000,
+      "weighted_score": 84.4304
+    },
+    {
+      "theme": "city",
+      "count": 49,
+      "mean_positive": 66.67708333333333,
+      "total_owners": 3535000,
+      "weighted_score": 78.50141843971632
+    },
+    {
+      "theme": "crime",
+      "count": 40,
+      "mean_positive": 78.55,
+      "total_owners": 795000,
+      "weighted_score": 75.44276729559749
+    },
+    {
+      "theme": "food",
+      "count": 37,
+      "mean_positive": 81.8111111111111,
+      "total_owners": 545000,
+      "weighted_score": 77.98504672897197
+    },
+    {
+      "theme": "mining",
+      "count": 28,
+      "mean_positive": 74.85357142857143,
+      "total_owners": 2435000,
+      "weighted_score": 84.23388090349076
+    },
+    {
+      "theme": "mythology",
+      "count": 28,
+      "mean_positive": 72.83703703703704,
+      "total_owners": 1295000,
+      "weighted_score": 82.84902723735408
+    },
+    {
+      "theme": "factory",
+      "count": 27,
+      "mean_positive": 72.64074074074075,
+      "total_owners": 1135000,
+      "weighted_score": 76.76387665198237
+    },
+    {
+      "theme": "military",
+      "count": 22,
+      "mean_positive": 68.56818181818181,
+      "total_owners": 645000,
+      "weighted_score": 69.9077519379845
+    },
+    {
+      "theme": "robot",
+      "count": 11,
+      "mean_positive": 88.2909090909091,
+      "total_owners": 250000,
+      "weighted_score": 88.964
+    },
+    {
+      "theme": "ocean",
+      "count": 11,
+      "mean_positive": 83.55454545454545,
+      "total_owners": 135000,
+      "weighted_score": 83.50740740740741
+    },
+    {
+      "theme": "pirate",
+      "count": 9,
+      "mean_positive": 76.64444444444445,
+      "total_owners": 280000,
+      "weighted_score": 71.59107142857142
     },
     {
       "theme": "cookie",
